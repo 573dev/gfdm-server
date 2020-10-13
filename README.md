@@ -4,5 +4,27 @@
 
 Simlated eAmuse Server for GFDM V8
 
+## Development
+
+To run this in development mode, you should do the following:
+
+```python
+# Create a venv and install the package
+python -m venv venv
+. venv/bin/activate
+pip install --upgrade pip
+pip install -e .
+
+# Set the development environment variables
+export FLASK_APP=v8_server
+export FLASK_ENV=development
+
+# Run the server
+flask run
+
+# To run in ssl mode
+flask run --cert=adhoc
+```
+
 ## License
 v8\_server is provided under an MIT License.
