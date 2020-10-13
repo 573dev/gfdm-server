@@ -1,0 +1,5 @@
+include v8_server/VERSION
+include VERSION
+include README.md
+include LICENSE
+include CHANGES.md
