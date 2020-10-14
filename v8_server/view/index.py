@@ -1,7 +1,4 @@
-from collections import OrderedDict
-
 from flask import request
-from lxml import etree as ET
 from lxml.builder import E
 
 from v8_server import app
@@ -11,6 +8,10 @@ from v8_server.utils.xml import eamuse_prepare_xml, eamuse_read_xml
 @app.route("/", defaults={"path": ""}, methods=["GET", "POST"])
 @app.route("/<path:path>", methods=["GET", "POST"])
 def catch_all(path):
+    """
+    This is currently my catch all route, for whenever a new endpoint pops up that isn't
+    implemented
+    """
     d = f"""
     {request.args}
     {request.form}
@@ -24,6 +25,12 @@ def catch_all(path):
     return "You want path: %s" % path
 
 
+def base_response(element, attributes=None):
+    if attributes is None:
+        attributes = {}
+    return E.response(E(element, {**attributes, "expire": "600"}))
+
+
 @app.route("/pcbtracker/service", methods=["POST"])
 def pcbtracker():
     """
@@ -32,16 +39,15 @@ def pcbtracker():
 
     For V8 it should not be active.
     """
-    request_xml, model, module, method, command = eamuse_read_xml(request)
+    method = eamuse_read_xml(request)[3]
 
     if method == "alive":
-        response = E.response(E.pcbtracker(OrderedDict(ecenable="0", expire="600")))
-        response_body, headers = eamuse_prepare_xml(response)
+        response = base_response("pcbtracker", {"ecenable": "0"})
     else:
         # There shoulnd't really even be any other methods
         raise Exception("Not sure how to handle this PCBTracker Request")
 
-    return response_body, headers
+    return eamuse_prepare_xml(response)
 
 
 @app.route("/message/service", methods=["POST"])
@@ -49,12 +55,9 @@ def message():
     """
     Unknown what this does. Possibly for operator messages?
     """
-    request_xml, model, module, method, command = eamuse_read_xml(request)
-
-    response = E.response(E.message(OrderedDict(expire="600")))
-    response_body, headers = eamuse_prepare_xml(response)
-
-    return response_body, headers
+    _ = eamuse_read_xml(request)
+    response = base_response("message")
+    return eamuse_prepare_xml(response)
 
 
 @app.route("/pcbevent/service", methods=["POST"])
@@ -62,12 +65,12 @@ def pcbevent():
     """
     Handle a PCBEvent request. We do nothing for this aside from logging the event.
     """
-    request_xml, model, module, method, command = eamuse_read_xml(request)
+    _ = eamuse_read_xml(request)
 
-    response = E.response(E.pcbevent(OrderedDict(expire="600")))
-    response_body, headers = eamuse_prepare_xml(response)
+    # TODO: Log the data from `request_xml`
 
-    return response_body, headers
+    response = base_response("pcbevent")
+    return eamuse_prepare_xml(response)
 
 
 @app.route("/facility/service", methods=["POST"])
@@ -77,7 +80,7 @@ def facility():
     which expects to return a bunch of information about the arcade this cabinet is in,
     as well as some settings for URLs and the name of the cab.
     """
-    request_xml, model, module, method, command = eamuse_read_xml(request)
+    _ = eamuse_read_xml(request)
 
     response = E.response(
         E.facility(
@@ -118,10 +121,7 @@ def facility():
             {"expire": "600"},
         )
     )
-
-    response_body, headers = eamuse_prepare_xml(response)
-
-    return response_body, headers
+    return eamuse_prepare_xml(response)
 
 
 @app.route("/package/service", methods=["POST"])
@@ -129,12 +129,10 @@ def package():
     """
     This is for supporting downloading of updates. We don't support this.
     """
-    request_xml, model, module, method, command = eamuse_read_xml(request)
+    _ = eamuse_read_xml(request)
 
-    response = E.response(E.package())
-    response_body, headers = eamuse_prepare_xml(response)
-
-    return response_body, headers
+    response = base_response("package")
+    return eamuse_prepare_xml(response)
 
 
 @app.route("/service/services/services/", methods=["POST"])
@@ -144,41 +142,20 @@ def services():
     _ = eamuse_read_xml(request)
 
     service_names = [
-        "pcbtracker",
-        "pcbevent",
-        "facility",
-        "message",
-        "package",
-        "userdata",
-        "userid",
-        "dlstatus",
-        "traceroute",
-        "eacoin",
-        "netlog",
-        "sidmgr",
-    ]
-
-    """
-        "binary",
-        "cardmng",
         "dlstatus",
         "eacoin",
-        "eemall",
         "facility",
-        "info",
-        "lobby",
         "local",
+        "message",
         "netlog",
-        "numbering",
+        "package",
         "pcbevent",
-        "pkglist",
-        "posevent",
-        "reference",
-        "shopinf",
+        "pcbtracker",
         "sidmgr",
+        "traceroute",
         "userdata",
         "userid",
-    """
+    ]
 
     services = {
         "ntp": "ntp://pool.ntp.org",
@@ -195,10 +172,8 @@ def services():
             method="get",
             mode="operation",
             status="0",
-            *[E.item(OrderedDict(name=k, url=services[k])) for k in services],
+            *[E.item({"name": k, "url": services[k]}) for k in services],
         )
     )
 
-    response_body, headers = eamuse_prepare_xml(response)
-
-    return response_body, 200, headers
+    return eamuse_prepare_xml(response)
