@@ -138,6 +138,30 @@ def package() -> Tuple[bytes, Dict[str, str]]:
     return eamuse_prepare_xml(response)
 
 
+@app.route("/local/service", methods=["POST"])
+def local() -> Tuple[bytes, Dict[str, str]]:
+    xml, model, module, method, command = eamuse_read_xml(request)
+
+    if module == "shopinfo":
+        if method == "regist":
+            response = E.response(
+                E.shopinfo(
+                    E.data(
+                        E.cabid("1", {"__type": "u32"}),
+                        E.locationid("nowhere"),
+                        E.is_send("1", {"__type": "u8"}),
+                    )
+                )
+            )
+    elif module == "demodata":
+        if method == "get":
+            response = E.response()
+    else:
+        response = base_response(module)
+
+    return eamuse_prepare_xml(response)
+
+
 @app.route("/service/services/services/", methods=["POST"])
 def services() -> Tuple[bytes, Dict[str, str]]:
     # We don't need to actually read the data here, but let's do it anyway as it saves a

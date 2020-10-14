@@ -13,7 +13,6 @@ REQUIREMENTS = [
     "pyopenssl",
     "lxml",
     "pycryptodome",
-    "lzss",
     "kbinxml",
 ]
 

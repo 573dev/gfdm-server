@@ -5,13 +5,13 @@ from time import time
 from typing import Dict, Tuple
 
 import lxml
-import lzss
 from flask import Request
 from kbinxml import KBinXML
 from lxml import etree as ET  # noqa: N812
 
 from v8_server.utils.arc4 import EamuseARC4
 from v8_server.utils.eamuse import get_timestamp
+from v8_server.utils.lz77 import Lz77
 
 
 EAMUSE_CONFIG = {"encrypted": False, "compressed": False}
@@ -37,7 +37,8 @@ def eamuse_read_xml(request: Request) -> Tuple[str, str, str, str, str]:
     compress = headers["x-compress"] if "x-compress" in headers else None
 
     if compress == "lz77":
-        xml_dec = lzss.decompress(xml_dec)
+        lz77 = Lz77()
+        xml_dec = lz77.decompress(xml_dec)
         EAMUSE_CONFIG["compress"] = True
     else:
         EAMUSE_CONFIG["compress"] = False
@@ -98,7 +99,8 @@ def eamuse_prepare_xml(xml: str) -> Tuple[bytes, Dict[str, str]]:
 
     if EAMUSE_CONFIG["compress"]:
         headers["X-Compress"] = "lz77"
-        # Actually do some compression here if we have to
+        lz77 = Lz77()
+        xml_bin = lz77.compress(xml_bin)
 
     headers["X-Eamuse-Info"] = x_eamuse_info
 
