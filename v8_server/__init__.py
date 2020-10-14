@@ -5,7 +5,7 @@ from typing import Optional, Union
 from flask import Flask
 
 from v8_server.config import Development, Production
-from v8_server.utils import generate_secret_key
+from v8_server.utils.flask import generate_secret_key
 
 from .version import __version__
 
