@@ -1,4 +1,7 @@
+from typing import Dict, Tuple
+
 from flask import request
+from lxml import etree as ET  # noqa: N812
 from lxml.builder import E
 
 from v8_server import app
@@ -7,32 +10,32 @@ from v8_server.utils.xml import eamuse_prepare_xml, eamuse_read_xml
 
 @app.route("/", defaults={"path": ""}, methods=["GET", "POST"])
 @app.route("/<path:path>", methods=["GET", "POST"])
-def catch_all(path):
+def catch_all(path: str) -> str:
     """
     This is currently my catch all route, for whenever a new endpoint pops up that isn't
     implemented
     """
     d = f"""
-    {request.args}
-    {request.form}
-    {request.files}
-    {request.values}
-    {request.json}
-    {request.data}
-    {request.headers}
+        {request.args!r}
+        {request.form!r}
+        {request.files!r}
+        {request.values!r}
+        {request.json!r}
+        {request.data!r}
+        {request.headers!r}
     """
     print(d)
     return "You want path: %s" % path
 
 
-def base_response(element, attributes=None):
+def base_response(element: str, attributes: Dict[str, str] = None) -> ET:
     if attributes is None:
         attributes = {}
     return E.response(E(element, {**attributes, "expire": "600"}))
 
 
 @app.route("/pcbtracker/service", methods=["POST"])
-def pcbtracker():
+def pcbtracker() -> Tuple[bytes, Dict[str, str]]:
     """
     Handle a PCBTracker.alive request. The only method of note is the "alive" method
     which returns whether PASELI should be active or not for this session.
@@ -51,7 +54,7 @@ def pcbtracker():
 
 
 @app.route("/message/service", methods=["POST"])
-def message():
+def message() -> Tuple[bytes, Dict[str, str]]:
     """
     Unknown what this does. Possibly for operator messages?
     """
@@ -61,7 +64,7 @@ def message():
 
 
 @app.route("/pcbevent/service", methods=["POST"])
-def pcbevent():
+def pcbevent() -> Tuple[bytes, Dict[str, str]]:
     """
     Handle a PCBEvent request. We do nothing for this aside from logging the event.
     """
@@ -74,7 +77,7 @@ def pcbevent():
 
 
 @app.route("/facility/service", methods=["POST"])
-def facility():
+def facility() -> Tuple[bytes, Dict[str, str]]:
     """
     Handle a facility request. The only method of note is the "get" request,
     which expects to return a bunch of information about the arcade this cabinet is in,
@@ -125,7 +128,7 @@ def facility():
 
 
 @app.route("/package/service", methods=["POST"])
-def package():
+def package() -> Tuple[bytes, Dict[str, str]]:
     """
     This is for supporting downloading of updates. We don't support this.
     """
@@ -136,13 +139,13 @@ def package():
 
 
 @app.route("/service/services/services/", methods=["POST"])
-def services():
+def services() -> Tuple[bytes, Dict[str, str]]:
     # We don't need to actually read the data here, but let's do it anyway as it saves a
     # copy
     _ = eamuse_read_xml(request)
 
     service_names = [
-        "dlstatus",
+        "cardmng",
         "eacoin",
         "facility",
         "local",

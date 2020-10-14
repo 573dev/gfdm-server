@@ -1,10 +1,12 @@
-import datetime
+from datetime import datetime, timedelta
 from os import urandom
 from pathlib import Path
 from tempfile import gettempdir
 
 
-def generate_secret_key(secret_key_filename, expiry_delta=None):
+def generate_secret_key(
+    secret_key_filename: str, expiry_delta: timedelta = None
+) -> bytes:
     secret_key_file = Path(gettempdir()) / secret_key_filename
     secret_exists = secret_key_file.exists()
 

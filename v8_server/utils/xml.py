@@ -2,9 +2,11 @@ from binascii import unhexlify
 from pathlib import Path
 from random import randint
 from time import time
+from typing import Dict, Tuple
 
 import lxml
 import lzss
+from flask import Request
 from kbinxml import KBinXML
 from lxml import etree as ET  # noqa: N812
 
@@ -16,7 +18,7 @@ EAMUSE_CONFIG = {"encrypted": False, "compressed": False}
 REQUESTS_PATH = Path("./requests")
 
 
-def eamuse_read_xml(request):
+def eamuse_read_xml(request: Request) -> Tuple[str, str, str, str, str]:
     # Get encrypted/compressed data from client
     headers = request.headers
     data = request.data
@@ -69,7 +71,7 @@ def eamuse_read_xml(request):
     return xml_text, model, module, method, command
 
 
-def eamuse_prepare_xml(xml):
+def eamuse_prepare_xml(xml: str) -> Tuple[bytes, Dict[str, str]]:
     x_eamuse_info = f"1-{int(time()):08x}-{randint(0x0000, 0xffff):04x}"
     key = unhexlify(x_eamuse_info[2:].replace("-", ""))
 

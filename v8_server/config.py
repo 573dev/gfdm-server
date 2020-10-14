@@ -1,13 +1,13 @@
 class Config(object):
-    DEBUG = False
-    TESTING = False
-    DB_SERVER = "localhost"
-    SECRET_KEY_FILENAME = "v8_server.key"
+    DEBUG: bool = False
+    TESTING: bool = False
+    DB_SERVER: str = "localhost"
+    SECRET_KEY_FILENAME: str = "v8_server.key"
 
 
 class Development(Config):
-    DEBUG = True
-    SECRET_KEY_FILENAME = "dev_v8_server.key"
+    DEBUG: bool = True
+    SECRET_KEY_FILENAME: str = "dev_v8_server.key"
 
 
 class Production(Config):
