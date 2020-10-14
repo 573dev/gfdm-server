@@ -91,7 +91,7 @@ def facility():
                 E.name("H"),
                 E.type("0", {"__type": "u8"}),
             ),
-            E.line(E.id("."), E("class", "0", {"__type": "u8"}),),
+            E.line(E.id("."), E("class", "0", {"__type": "u8"})),
             E.portfw(
                 E.globalip("192.168.1.139", {"__type": "ip4", "__count": "1"}),
                 E.globalport("80", {"__type": "u16"}),

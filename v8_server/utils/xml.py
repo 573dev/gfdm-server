@@ -6,7 +6,7 @@ from time import time
 import lxml
 import lzss
 from kbinxml import KBinXML
-from lxml import etree as ET
+from lxml import etree as ET  # noqa: N812
 
 from v8_server.utils.arc4 import EamuseARC4
 from v8_server.utils.eamuse import get_timestamp
