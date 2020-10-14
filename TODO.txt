@@ -1,0 +1,2 @@
+- Implement proper logging (is there some sort of flask logging, or should I just log to a file?)
+- Add typing
