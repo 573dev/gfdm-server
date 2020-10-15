@@ -1,3 +1,4 @@
+import logging
 from binascii import unhexlify
 from pathlib import Path
 from random import randint
@@ -13,6 +14,9 @@ from v8_server.utils.arc4 import EamuseARC4
 from v8_server.utils.eamuse import get_timestamp
 from v8_server.utils.lz77 import Lz77
 
+
+logger = logging.getLogger(__name__)
+rlogger = logging.getLogger("requests")
 
 EAMUSE_CONFIG = {"encrypted": False, "compressed": False}
 REQUESTS_PATH = Path("./requests")
@@ -52,19 +56,15 @@ def eamuse_read_xml(request: Request) -> Tuple[str, str, str, str, str]:
     with output_filename.open("w") as f:
         f.write(xml_text.decode("UTF-8"))
 
-    model = root.attrib["model"]
-    module = root[0].tag
-    method = root[0].attrib["method"] if "method" in root[0].attrib else None
-    command = root[0].attrib["command"] if "command" in root[0].attrib else None
+    model = str(root.attrib["model"])
+    module = str(root[0].tag)
+    method = str(root[0].attrib["method"] if "method" in root[0].attrib else None)
+    command = str(root[0].attrib["command"] if "command" in root[0].attrib else None)
 
-    print(
-        "---- Read Request ----\n"
-        f"Headers: [{dict(headers)}]\n"
-        f"  Model: [{model}]\n"
-        f" Module: [{module}]\n"
-        f" Method: [{method}]\n"
-        f"Command: [{command}]\n"
-        "   Data:\n"
+    rlogger.debug(
+        "---- Request ----\n"
+        f"[ {'Model':^20} | {'Module':^15} | {'Method':^15} | {'Command':^20} ]\n"
+        f"[ {model:^20} | {module:^15} | {method:^15} | {command:^20} ]\n"
         f"{xml_text.decode('UTF-8')[:-1]}\n"
     )
 
@@ -110,11 +110,9 @@ def eamuse_prepare_xml(xml: str) -> Tuple[bytes, Dict[str, str]]:
     else:
         data = xml_bin
 
-    print(
-        "---- Write Response ----\n"
-        "   Data: [\n"
+    rlogger.debug(
+        "---- Response ----\n"
         f"{ET.tostring(xml_root, pretty_print=True).decode('UTF-8')[:-1]}\n"
-        f"Headers: [{headers}]\n"
     )
 
     return data, headers

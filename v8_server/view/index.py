@@ -15,16 +15,21 @@ def catch_all(path: str) -> str:
     This is currently my catch all route, for whenever a new endpoint pops up that isn't
     implemented
     """
-    d = f"""
-        {request.args!r}
-        {request.form!r}
-        {request.files!r}
-        {request.values!r}
-        {request.json!r}
-        {request.data!r}
-        {request.headers!r}
-    """
-    print(d)
+    headers = request.headers
+
+    header_str = ""
+    for header in headers:
+        header_str += f"{header[0]:>15}: {header[1]}\n"
+
+    args = "None" if len(request.args) == 0 else request.args
+    data = request.data
+    d = (
+        "*** Unknown Request ***\n"
+        f"           Args: {args}\n"
+        f"    Data Length: {len(data)}\n"
+        f"{header_str[:-1]}\n"
+    )
+    app.logger.debug(d)
     return "You want path: %s" % path
 
 
@@ -140,6 +145,11 @@ def package() -> Tuple[bytes, Dict[str, str]]:
 
 @app.route("/local/service", methods=["POST"])
 def local() -> Tuple[bytes, Dict[str, str]]:
+    """
+    This is probably a big chunk of implementation. Handle all "local" service requests
+    which might have a whole bunch of stuff going on
+    """
+
     xml, model, module, method, command = eamuse_read_xml(request)
 
     if module == "shopinfo":
@@ -155,7 +165,7 @@ def local() -> Tuple[bytes, Dict[str, str]]:
             )
     elif module == "demodata":
         if method == "get":
-            response = E.response()
+            response = E.response(E.demodata())
     else:
         response = base_response(module)
 

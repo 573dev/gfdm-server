@@ -1,1 +1,2 @@
-- Implement proper logging (is there some sort of flask logging, or should I just log to a file?)
+- Logging is implemented, so lets throw some logs around perhaps
+- Fix the issue where the log directory probably shouldn't be a relative path
