@@ -35,7 +35,7 @@ class RequestFormatter(logging.Formatter):
 
 
 # Define the logger
-logpath = Path(__file__).parent.parent
+LOG_PATH = Path(__file__).parent.parent / "logs"
 dictConfig(
     {
         "version": 1,
@@ -59,25 +59,25 @@ dictConfig(
             },
             "debugfile": {
                 "class": "logging.handlers.TimedRotatingFileHandler",
-                "filename": logpath / "debug.log",
+                "filename": LOG_PATH / "debug.log",
                 "formatter": "default",
                 "when": "midnight",
             },
             "requestsfile": {
                 "class": "logging.handlers.TimedRotatingFileHandler",
-                "filename": logpath / "requests.log",
+                "filename": LOG_PATH / "requests.log",
                 "formatter": "detailed",
                 "when": "midnight",
             },
             "allfile": {
                 "class": "logging.handlers.TimedRotatingFileHandler",
-                "filename": logpath / "all.log",
+                "filename": LOG_PATH / "all.log",
                 "formatter": "detailed",
                 "when": "midnight",
             },
             "werkzeugfile": {
                 "class": "logging.handlers.TimedRotatingFileHandler",
-                "filename": logpath / "werkzeug.log",
+                "filename": LOG_PATH / "werkzeug.log",
                 "formatter": "detailed",
                 "when": "midnight",
             },
@@ -115,4 +115,4 @@ app.config.from_object(config)
 import v8_server.view  # noqa: F401, E402
 
 
-__all__ = ["__version__", "app"]
+__all__ = ["__version__", "app", "LOG_PATH"]

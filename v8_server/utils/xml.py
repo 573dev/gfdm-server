@@ -11,6 +11,7 @@ from flask import Request
 from kbinxml import KBinXML
 from lxml import etree as ET  # noqa: N812
 
+from v8_server import LOG_PATH
 from v8_server.utils.arc4 import EamuseARC4
 from v8_server.utils.lz77 import Lz77
 
@@ -50,20 +51,19 @@ def get_compression_type(request: Request) -> str:
 
 def save_xml(data: bytes, request: Request, kind: str, _type: str = "xml") -> None:
     # Always make sure the dir exists
-    dirpath = Path("./logs/requests")
-    dirpath.mkdir(exist_ok=True)
+    dirpath = LOG_PATH / "requests"
+    dirpath.mkdir(parents=True, exist_ok=True)
 
-    # We want some unique identifiers to match requests and responses, so lets use the
-    # x-eamuse-info header, as well as a hash of the data
-    info = ""
+    # We want a unique identifier to match requests and responses, so lets use the
+    # x-eamuse-info header if it exists, else just a hash of the data
+    info = str(abs(hash(request.data)))[0:8]
     if is_encrypted(request):
-        x_eamuse_info, _ = get_encryption_key(request)
-        info = f"_{x_eamuse_info.replace('-', '_')}"
-    data_hash = str(hash(request.data))
+        x_eamuse_info = get_encryption_key(request)[0]
+        info = x_eamuse_info.replace("-", "_")[2:]
 
     # Write out the data
-    date = datetime.now().strftime("%Y_%m_%d_%H_%M")
-    filepath = dirpath / f"eamuse_{date}_{data_hash}{info}_{kind}.{type}"
+    date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    filepath = dirpath / f"eamuse_{date}_{info}_{kind}.{_type}"
     with filepath.open("wb") as f:
         logging.debug(f"Writing File: {filepath}")
         f.write(data)
@@ -81,10 +81,7 @@ def eamuse_read_xml(request: Request) -> Tuple[str, str, str, str, str]:
     # Decompress the data if necessary
     # Right now we only de-compress lz77
     if is_compressed(request) and get_compression_type(request) == "lz77":
-        print("I DECOMPRESSED")
         xml_bin = Lz77().decompress(xml_bin)
-    else:
-        print("NOPE")
 
     # Convert the binary xml data to text bytes and save a copy
     try:
@@ -135,7 +132,9 @@ def eamuse_prepare_xml(
 
     # Convert XML to binary and save
     xml_bin = KBinXML(xml_bytes).to_binary()
-    save_xml(xml_bin, request, "resp", _type="bin")
+
+    # TODO: I don't know that we really need to save the binary xml
+    # save_xml(xml_bin, request, "resp", _type="bin")
 
     # Compress if necessary
     # Right now we only compress lz77
