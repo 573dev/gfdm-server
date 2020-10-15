@@ -40,7 +40,6 @@ setup(
     install_requires=REQUIREMENTS,
     classifiers=[
         "Environment :: Console",
-        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.8",

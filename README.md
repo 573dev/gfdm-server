@@ -2,7 +2,7 @@
 [![Python Version](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
-Simlated eAmuse Server for GFDM V8
+Simlated eAmuse Server for GFDM V8 (maybe also V7 in the future?)
 
 ## Development
 
@@ -21,10 +21,4 @@ export FLASK_ENV=development
 
 # Run the server
 flask run
-
-# To run in ssl mode
-flask run --cert=adhoc
 ```
-
-## License
-v8\_server is provided under an MIT License.
