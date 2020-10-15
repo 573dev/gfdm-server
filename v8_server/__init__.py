@@ -35,6 +35,7 @@ class RequestFormatter(logging.Formatter):
 
 
 # Define the logger
+logpath = Path(__file__).parent.parent
 dictConfig(
     {
         "version": 1,
@@ -58,25 +59,25 @@ dictConfig(
             },
             "debugfile": {
                 "class": "logging.handlers.TimedRotatingFileHandler",
-                "filename": "logs/debug.log",
+                "filename": logpath / "debug.log",
                 "formatter": "default",
                 "when": "midnight",
             },
             "requestsfile": {
                 "class": "logging.handlers.TimedRotatingFileHandler",
-                "filename": "logs/requests.log",
+                "filename": logpath / "requests.log",
                 "formatter": "detailed",
                 "when": "midnight",
             },
             "allfile": {
                 "class": "logging.handlers.TimedRotatingFileHandler",
-                "filename": "logs/all.log",
+                "filename": logpath / "all.log",
                 "formatter": "detailed",
                 "when": "midnight",
             },
             "werkzeugfile": {
                 "class": "logging.handlers.TimedRotatingFileHandler",
-                "filename": "logs/werkzeug.log",
+                "filename": logpath / "werkzeug.log",
                 "formatter": "detailed",
                 "when": "midnight",
             },

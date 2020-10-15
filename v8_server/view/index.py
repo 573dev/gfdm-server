@@ -55,7 +55,7 @@ def pcbtracker() -> Tuple[bytes, Dict[str, str]]:
         # There shoulnd't really even be any other methods
         raise Exception("Not sure how to handle this PCBTracker Request")
 
-    return eamuse_prepare_xml(response)
+    return eamuse_prepare_xml(response, request)
 
 
 @app.route("/message/service", methods=["POST"])
@@ -65,7 +65,7 @@ def message() -> Tuple[bytes, Dict[str, str]]:
     """
     _ = eamuse_read_xml(request)
     response = base_response("message")
-    return eamuse_prepare_xml(response)
+    return eamuse_prepare_xml(response, request)
 
 
 @app.route("/pcbevent/service", methods=["POST"])
@@ -78,7 +78,7 @@ def pcbevent() -> Tuple[bytes, Dict[str, str]]:
     # TODO: Log the data from `request_xml`
 
     response = base_response("pcbevent")
-    return eamuse_prepare_xml(response)
+    return eamuse_prepare_xml(response, request)
 
 
 @app.route("/facility/service", methods=["POST"])
@@ -129,7 +129,7 @@ def facility() -> Tuple[bytes, Dict[str, str]]:
             {"expire": "600"},
         )
     )
-    return eamuse_prepare_xml(response)
+    return eamuse_prepare_xml(response, request)
 
 
 @app.route("/package/service", methods=["POST"])
@@ -140,7 +140,7 @@ def package() -> Tuple[bytes, Dict[str, str]]:
     _ = eamuse_read_xml(request)
 
     response = base_response("package")
-    return eamuse_prepare_xml(response)
+    return eamuse_prepare_xml(response, request)
 
 
 @app.route("/local/service", methods=["POST"])
@@ -169,7 +169,7 @@ def local() -> Tuple[bytes, Dict[str, str]]:
     else:
         response = base_response(module)
 
-    return eamuse_prepare_xml(response)
+    return eamuse_prepare_xml(response, request)
 
 
 @app.route("/service/services/services/", methods=["POST"])
@@ -213,4 +213,4 @@ def services() -> Tuple[bytes, Dict[str, str]]:
         )
     )
 
-    return eamuse_prepare_xml(response)
+    return eamuse_prepare_xml(response, request)
