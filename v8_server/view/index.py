@@ -74,9 +74,6 @@ def pcbevent() -> Tuple[bytes, Dict[str, str]]:
     Handle a PCBEvent request. We do nothing for this aside from logging the event.
     """
     _ = eamuse_read_xml(request)
-
-    # TODO: Log the data from `request_xml`
-
     response = base_response("pcbevent")
     return eamuse_prepare_xml(response, request)
 

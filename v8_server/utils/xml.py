@@ -1,10 +1,9 @@
 import logging
 from binascii import unhexlify
 from datetime import datetime
-from pathlib import Path
 from random import randint
 from time import time
-from typing import Dict, Tuple, Union
+from typing import Dict, Optional, Tuple, Union
 
 import lxml
 from flask import Request
@@ -49,6 +48,22 @@ def get_compression_type(request: Request) -> str:
     return request.headers[X_COMPRESS]
 
 
+def get_xml_tag(xml: lxml.etree._Element) -> str:
+    return str(xml.tag)
+
+
+def get_xml_attrib(xml: lxml.etree._Element, name: str) -> str:
+    return str(xml.attrib[name]) if name in xml.attrib else "None"
+
+
+def format_date(timestamp: Optional[int]) -> str:
+    if timestamp is None:
+        return "None"
+
+    dt = datetime.fromtimestamp(timestamp)
+    return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+
 def save_xml(data: bytes, request: Request, kind: str, _type: str = "xml") -> None:
     # Always make sure the dir exists
     dirpath = LOG_PATH / "requests"
@@ -69,7 +84,7 @@ def save_xml(data: bytes, request: Request, kind: str, _type: str = "xml") -> No
         f.write(data)
 
 
-def eamuse_read_xml(request: Request) -> Tuple[str, str, str, str, str]:
+def eamuse_read_xml(request: Request) -> Tuple[lxml.etree._Element, str, str, str, str]:
     # Get the raw xml data from the request
     xml_bin = request.data
 
@@ -95,10 +110,10 @@ def eamuse_read_xml(request: Request) -> Tuple[str, str, str, str, str]:
     root = ET.fromstring(xml_bytes)
 
     # Grab the xml information we care about
-    model = str(root.attrib["model"])
-    module = str(root[0].tag)
-    method = str(root[0].attrib["method"] if "method" in root[0].attrib else None)
-    command = str(root[0].attrib["command"] if "command" in root[0].attrib else None)
+    model = get_xml_attrib(root, "mode")
+    module = get_xml_tag(root[0])
+    method = get_xml_attrib(root[0], "method")
+    command = get_xml_attrib(root[0], "command")
 
     rlogger.debug(
         "---- Request ----\n"
@@ -107,8 +122,8 @@ def eamuse_read_xml(request: Request) -> Tuple[str, str, str, str, str]:
         f"{xml_bytes.decode('UTF-8')}\n"
     )
 
-    # Return raw XML
-    return xml_bytes, model, module, method, command
+    # Return XML and important fields
+    return root, model, module, method, command
 
 
 def eamuse_prepare_xml(

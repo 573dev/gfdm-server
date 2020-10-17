@@ -102,5 +102,5 @@ ENV/
 # mypy
 .mypy_cache/
 
-# request data
-requests/
+# logs
+logs/
