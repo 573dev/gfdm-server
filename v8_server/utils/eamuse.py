@@ -1,8 +1,8 @@
-from time import time
+from typing import Dict, Optional
 
 
-def get_timestamp() -> str:
-    """
-    Make a timestamp int for logging purposes
-    """
-    return str(int(round(time() * 1000)))
+def e_type(_type, count: Optional[int] = None) -> Dict[str, str]:
+    result = {"__type": _type}
+    if count is not None:
+        result["__count"] = str(count)
+    return result

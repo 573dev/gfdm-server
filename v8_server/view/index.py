@@ -5,6 +5,7 @@ from lxml import etree as ET  # noqa: N812
 from lxml.builder import E
 
 from v8_server import app
+from v8_server.utils.eamuse import e_type
 from v8_server.utils.xml import eamuse_prepare_xml, eamuse_read_xml
 
 
@@ -94,27 +95,27 @@ def facility() -> Tuple[bytes, Dict[str, str]]:
                 E.country("US"),
                 E.region("."),
                 E.name("H"),
-                E.type("0", {"__type": "u8"}),
+                E.type("0", e_type("u8")),
             ),
-            E.line(E.id("."), E("class", "0", {"__type": "u8"})),
+            E.line(E.id("."), E("class", "0", e_type("u8"))),
             E.portfw(
-                E.globalip("192.168.1.139", {"__type": "ip4", "__count": "1"}),
-                E.globalport("80", {"__type": "u16"}),
-                E.privateport("80", {"__type": "u16"}),
+                E.globalip("192.168.1.139", e_type("ip4", count=1)),
+                E.globalport("80", e_type("u16")),
+                E.privateport("80", e_type("u16")),
             ),
             E.public(
-                E.flag("1", {"__type": "u8"}),
+                E.flag("1", e_type("u8")),
                 E.name("."),
                 E.latitude("0"),
                 E.longitude("0"),
             ),
             E.share(
                 E.eacoin(
-                    E.notchamount("3000", {"__type": "s32"}),
-                    E.notchcount("3", {"__type": "s32"}),
-                    E.supplylimit("10000", {"__type": "s32"}),
+                    E.notchamount("3000", e_type("s32")),
+                    E.notchcount("3", e_type("s32")),
+                    E.supplylimit("10000", e_type("s32")),
                 ),
-                E.eapass(E.valid("365", {"__type": "u16"})),
+                E.eapass(E.valid("365", e_type("u16"))),
                 E.url(
                     E.eapass("www.ea-pass.konami.net"),
                     E.arcadefan("www.konami.jp/am"),
@@ -140,6 +141,20 @@ def package() -> Tuple[bytes, Dict[str, str]]:
     return eamuse_prepare_xml(response, request)
 
 
+@app.route("/cardmng/service", methods=["POST"])
+def cardmng() -> Tuple[bytes, Dict[str, str]]:
+    """
+    This is for dealing with the card management
+    """
+    xml, model, module, method, command = eamuse_read_xml(request)
+
+    if method == "inquire":
+        card_id = get_xml_attrib(xml[0], "cardid")
+        # Check if the user has already been created
+
+    return ""
+
+
 @app.route("/local/service", methods=["POST"])
 def local() -> Tuple[bytes, Dict[str, str]]:
     """
@@ -154,9 +169,9 @@ def local() -> Tuple[bytes, Dict[str, str]]:
             response = E.response(
                 E.shopinfo(
                     E.data(
-                        E.cabid("1", {"__type": "u32"}),
+                        E.cabid("1", e_type("u32")),
                         E.locationid("nowhere"),
-                        E.is_send("1", {"__type": "u8"}),
+                        E.is_send("1", e_type("u8")),
                     )
                 )
             )
