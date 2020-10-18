@@ -7,9 +7,16 @@ from typing import Optional, Union
 from flask import Flask, has_request_context, request
 
 from v8_server.config import Development, Production
+from v8_server.model.connection import Base, Database
+from v8_server.model.user import User
 from v8_server.utils.flask import generate_secret_key
 
 from .version import __version__
+
+
+# Make sure the database has been created
+with Database() as db:
+    Base.metadata.create_all(db.engine)
 
 
 class RequestFormatter(logging.Formatter):

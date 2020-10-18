@@ -14,6 +14,8 @@ REQUIREMENTS = [
     "lxml",
     "pycryptodome",
     "kbinxml",
+    "sqlalchemy",
+    "sqlalchemy-stubs",
 ]
 
 EXTRAS = {

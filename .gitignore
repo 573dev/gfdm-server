@@ -104,3 +104,6 @@ ENV/
 
 # logs
 logs/
+
+# Decompiled v8 code
+decompiled/
