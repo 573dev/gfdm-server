@@ -7,15 +7,20 @@ from lxml.builder import E
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from v8_server import app
+from v8_server.eamuse.services.pcbtracker import PCBTracker
+from v8_server.eamuse.services.services import ServiceRequest, Services, ServiceType
+from v8_server.eamuse.utils.eamuse import e_type
+from v8_server.eamuse.utils.xml import get_xml_attrib
 from v8_server.model.connection import Database
 from v8_server.model.user import Card, ExtID, Profile, RefID, User
-from v8_server.utils.eamuse import e_type
-from v8_server.utils.xml import eamuse_prepare_xml, eamuse_read_xml, get_xml_attrib
 
 
-@app.route("/", defaults={"path": ""}, methods=["GET", "POST"])
-@app.route("/<path:path>", methods=["GET", "POST"])
-def catch_all(path: str) -> str:
+FlaskResponse = Tuple[bytes, Dict[str, str]]
+
+
+@app.route("/", defaults={"u_path": ""}, methods=["GET", "POST"])
+@app.route("/<path:u_path>", methods=["GET", "POST"])
+def catch_all(u_path: str) -> str:
     """
     This is currently my catch all route, for whenever a new endpoint pops up that isn't
     implemented
@@ -35,7 +40,7 @@ def catch_all(path: str) -> str:
         f"{header_str[:-1]}\n"
     )
     app.logger.debug(d)
-    return "You want path: %s" % path
+    return "You want path: %s" % u_path
 
 
 def base_response(element: str, attributes: Dict[str, str] = None) -> ET:
@@ -44,25 +49,19 @@ def base_response(element: str, attributes: Dict[str, str] = None) -> ET:
     return E.response(E(element, {**attributes, "expire": "600"}))
 
 
-@app.route("/pcbtracker/service", methods=["POST"])
-def pcbtracker() -> Tuple[bytes, Dict[str, str]]:
-    """
-    Handle a PCBTracker.alive request. The only method of note is the "alive" method
-    which returns whether PASELI should be active or not for this session.
+@Services.route(app, ServiceType.PCBTRACKER)
+def pcbtracker_service() -> FlaskResponse:
+    req = ServiceRequest(request)
 
-    For V8 it should not be active.
-    """
-    method = eamuse_read_xml(request)[3]
-
-    if method == "alive":
-        response = base_response("pcbtracker", {"ecenable": "0"})
+    if req.method == PCBTracker.ALIVE:
+        response = PCBTracker.alive()
     else:
-        # There shoulnd't really even be any other methods
-        raise Exception("Not sure how to handle this PCBTracker Request")
+        raise Exception(f"Not sure how to handle this PCBTracker Request: {req}")
 
-    return eamuse_prepare_xml(response, request)
+    return req.response(response)
 
 
+'''
 @app.route("/message/service", methods=["POST"])
 def message() -> Tuple[bytes, Dict[str, str]]:
     """
@@ -363,46 +362,11 @@ def local() -> Tuple[bytes, Dict[str, str]]:
 
     return eamuse_prepare_xml(response, request)
 
+'''
 
-@app.route("/service/services/services/", methods=["POST"])
-def services() -> Tuple[bytes, Dict[str, str]]:
-    # We don't need to actually read the data here, but let's do it anyway as it saves a
-    # copy
-    _ = eamuse_read_xml(request)
 
-    service_names = [
-        "cardmng",
-        "eacoin",
-        "facility",
-        "local",
-        "message",
-        "netlog",
-        "package",
-        "pcbevent",
-        "pcbtracker",
-        "sidmgr",
-        "userdata",
-        "userid",
-        "eemall",
-    ]
-
-    services = {
-        "ntp": "ntp://pool.ntp.org",
-        "keepalive": (
-            "http://eamuse.konami.fun/"
-            "keepalive?pa=127.0.0.1&ia=127.0.0.1&ga=127.0.0.1&ma=127.0.0.1&t1=2&t2=10"
-        ),
-        **{k: f"http://eamuse.konami.fun/{k}/service" for k in service_names},
-    }
-
-    response = E.response(
-        E.services(
-            expire="600",
-            method="get",
-            mode="operation",
-            status="0",
-            *[E.item({"name": k, "url": services[k]}) for k in services],
-        )
-    )
-
-    return eamuse_prepare_xml(response, request)
+@app.route(Services.SERVICES_ROUTE, methods=["POST"])
+def services_service() -> Tuple[bytes, Dict[str, str]]:
+    s_req = ServiceRequest(request)
+    services = Services().get_services()
+    return s_req.response(services)

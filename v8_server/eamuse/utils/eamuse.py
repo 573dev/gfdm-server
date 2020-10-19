@@ -1,4 +1,19 @@
+from __future__ import annotations
+
 from typing import Dict, Optional
+
+
+class XMLBinTypes(object):
+    s8 = "s8"
+    u8 = "u8"
+    s16 = "s16"
+    u16 = "u16"
+    s32 = "s32"
+    u32 = "u32"
+    s64 = "s64"
+    u64 = "u64"
+    ip4 = "ip4"
+    time = "time"
 
 
 def e_type(_type, count: Optional[int] = None) -> Dict[str, str]:
@@ -34,7 +49,7 @@ class Model:
         self.version = version
 
     @staticmethod
-    def from_modelstring(model: str) -> "Model":
+    def from_modelstring(model: Optional[str]) -> Optional[Model]:
         """
         Parse a modelstring and return a Model
         Parameters:
@@ -43,6 +58,9 @@ class Model:
         Returns:
             A Model object.
         """
+        if model is None:
+            return None
+
         parts = model.split(":")
         if len(parts) == 5:
             game, dest, spec, rev, version = parts
@@ -50,10 +68,15 @@ class Model:
         elif len(parts) == 4:
             game, dest, spec, rev = parts
             return Model(game, dest, spec, rev, None)
-        raise Exception("Couldn't parse model {}".format(model))
+        raise Exception(f"Couldn't parse model: {model}")
+
+    def __repr__(self) -> str:
+        version = f", version: {self.version}" if self.version is not None else ""
+        return (
+            f'Model<game: "{self.game}", destination: "{self.dest}", '
+            f'spec: "{self.spec}", revision: "{self.rev}"{version}>'
+        )
 
     def __str__(self) -> str:
-        if self.version is None:
-            return f"{self.game}:{self.dest}:{self.spec}:{self.rev}"
-        else:
-            return f"{self.game}:{self.dest}:{self.spec}:{self.rev}:{self.version}"
+        version = f":{self.version}" if self.version is not None else ""
+        return f"{self.game}:{self.dest}:{self.spec}:{self.rev}{version}"
