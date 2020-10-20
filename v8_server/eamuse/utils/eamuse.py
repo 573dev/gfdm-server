@@ -1,26 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Optional
-
-
-class XMLBinTypes(object):
-    s8 = "s8"
-    u8 = "u8"
-    s16 = "s16"
-    u16 = "u16"
-    s32 = "s32"
-    u32 = "u32"
-    s64 = "s64"
-    u64 = "u64"
-    ip4 = "ip4"
-    time = "time"
-
-
-def e_type(_type, count: Optional[int] = None) -> Dict[str, str]:
-    result = {"__type": _type}
-    if count is not None:
-        result["__count"] = str(count)
-    return result
+from typing import Optional
 
 
 class Model:

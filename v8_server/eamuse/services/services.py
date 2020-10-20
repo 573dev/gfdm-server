@@ -8,13 +8,13 @@ from random import randint
 from time import time
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
-from flask import Flask, Request
+from flask import Request
 from kbinxml import KBinXML
 from lxml import etree
 from lxml.builder import E
 from lxml.etree import _Element as eElement
 
-from v8_server import LOG_PATH
+from v8_server import LOG_PATH, app
 from v8_server.eamuse.utils.arc4 import EAmuseARC4
 from v8_server.eamuse.utils.eamuse import Model
 from v8_server.eamuse.utils.lz77 import Lz77
@@ -101,7 +101,7 @@ class Services(object):
         return services
 
     @classmethod
-    def route(cls, app: Flask, _type: ServiceType) -> Callable[[Any], Any]:
+    def route(cls, _type: ServiceType) -> Callable[[Any], Any]:
         def decorator(f):
             func = app.route(f"/{_type.value}", methods=["POST"])(f)
             return func

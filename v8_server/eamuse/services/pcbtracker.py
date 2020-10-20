@@ -22,4 +22,17 @@ class PCBTracker(object):
 
     @classmethod
     def alive(cls):
+        """
+        Example (if Paseli is not active):
+            <response>
+                <pcbtracker ecenable="0"/>
+            </response>
+
+        Potentially if Paseli is active, the response might look like so:
+            <response>
+                <pcbtracker time="" limit="" ecenable="1" eclimit=""/>
+            </response>
+
+        I am unsure what the `time`, `limit`, and `eclimit` responses would be.
+        """
         return E.response(E.pcbtracker({"ecenable": "1" if cls.PASELI_ACTIVE else "0"}))

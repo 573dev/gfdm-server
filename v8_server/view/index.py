@@ -2,14 +2,19 @@ import random
 from typing import Dict, Tuple
 
 from flask import request
-from lxml import etree as ET  # noqa: N812
-from lxml.builder import E
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from v8_server import app
-from v8_server.eamuse.services.pcbtracker import PCBTracker
-from v8_server.eamuse.services.services import ServiceRequest, Services, ServiceType
-from v8_server.eamuse.utils.eamuse import e_type
+from v8_server.eamuse.services import (
+    Facility,
+    Message,
+    Package,
+    PCBEvent,
+    PCBTracker,
+    ServiceRequest,
+    Services,
+    ServiceType,
+)
 from v8_server.eamuse.utils.xml import get_xml_attrib
 from v8_server.model.connection import Database
 from v8_server.model.user import Card, ExtID, Profile, RefID, User
@@ -43,13 +48,7 @@ def catch_all(u_path: str) -> str:
     return "You want path: %s" % u_path
 
 
-def base_response(element: str, attributes: Dict[str, str] = None) -> ET:
-    if attributes is None:
-        attributes = {}
-    return E.response(E(element, {**attributes, "expire": "600"}))
-
-
-@Services.route(app, ServiceType.PCBTRACKER)
+@Services.route(ServiceType.PCBTRACKER)
 def pcbtracker_service() -> FlaskResponse:
     req = ServiceRequest(request)
 
@@ -61,89 +60,57 @@ def pcbtracker_service() -> FlaskResponse:
     return req.response(response)
 
 
+@Services.route(ServiceType.MESSAGE)
+def message_service() -> FlaskResponse:
+    req = ServiceRequest(request)
+
+    if req.method == Message.GET:
+        response = Message.get()
+    else:
+        raise Exception(f"Not sure how to handle this Message Request: {req}")
+
+    return req.response(response)
+
+
+@Services.route(ServiceType.PCBEVENT)
+def pcbevent_service() -> FlaskResponse:
+    req = ServiceRequest(request)
+    event = PCBEvent(req)
+    app.logger.info(event)
+
+    if req.method == PCBEvent.PUT:
+        response = PCBEvent.put()
+    else:
+        raise Exception(f"Not sure how to handle this PCBEvent Request: {req}")
+
+    return req.response(response)
+
+
+@Services.route(ServiceType.PACKAGE)
+def package_service() -> FlaskResponse:
+    req = ServiceRequest(request)
+
+    if req.method == Package.LIST:
+        response = Package.list(req)
+    else:
+        raise Exception(f"Not sure how to handle this Package Request: {req}")
+
+    return req.response(response)
+
+
+@Services.route(ServiceType.FACILITY)
+def facility_service() -> FlaskResponse:
+    req = ServiceRequest(request)
+
+    if req.method == Facility.GET:
+        response = Facility.get()
+    else:
+        raise Exception(f"Not sure how to handle this Facility Request: {req}")
+
+    return req.response(response)
+
+
 '''
-@app.route("/message/service", methods=["POST"])
-def message() -> Tuple[bytes, Dict[str, str]]:
-    """
-    Unknown what this does. Possibly for operator messages?
-    """
-    _ = eamuse_read_xml(request)
-    response = base_response("message")
-    return eamuse_prepare_xml(response, request)
-
-
-@app.route("/pcbevent/service", methods=["POST"])
-def pcbevent() -> Tuple[bytes, Dict[str, str]]:
-    """
-    Handle a PCBEvent request. We do nothing for this aside from logging the event.
-    """
-    _ = eamuse_read_xml(request)
-    response = base_response("pcbevent")
-    return eamuse_prepare_xml(response, request)
-
-
-@app.route("/facility/service", methods=["POST"])
-def facility() -> Tuple[bytes, Dict[str, str]]:
-    """
-    Handle a facility request. The only method of note is the "get" request,
-    which expects to return a bunch of information about the arcade this cabinet is in,
-    as well as some settings for URLs and the name of the cab.
-    """
-    _ = eamuse_read_xml(request)
-
-    response = E.response(
-        E.facility(
-            E.location(
-                E.id("US-123"),
-                E.country("US"),
-                E.region("."),
-                E.name("H"),
-                E.type("0", e_type("u8")),
-            ),
-            E.line(E.id("."), E("class", "0", e_type("u8"))),
-            E.portfw(
-                E.globalip("192.168.1.139", e_type("ip4", count=1)),
-                E.globalport("80", e_type("u16")),
-                E.privateport("80", e_type("u16")),
-            ),
-            E.public(
-                E.flag("1", e_type("u8")),
-                E.name("."),
-                E.latitude("0"),
-                E.longitude("0"),
-            ),
-            E.share(
-                E.eacoin(
-                    E.notchamount("3000", e_type("s32")),
-                    E.notchcount("3", e_type("s32")),
-                    E.supplylimit("10000", e_type("s32")),
-                ),
-                E.eapass(E.valid("365", e_type("u16"))),
-                E.url(
-                    E.eapass("www.ea-pass.konami.net"),
-                    E.arcadefan("www.konami.jp/am"),
-                    E.konaminetdx("http://am.573.jp"),
-                    E.konamiid("http://id.konami.net"),
-                    E.eagate("http://eagate.573.jp"),
-                ),
-            ),
-            {"expire": "600"},
-        )
-    )
-    return eamuse_prepare_xml(response, request)
-
-
-@app.route("/package/service", methods=["POST"])
-def package() -> Tuple[bytes, Dict[str, str]]:
-    """
-    This is for supporting downloading of updates. We don't support this.
-    """
-    _ = eamuse_read_xml(request)
-
-    response = base_response("package")
-    return eamuse_prepare_xml(response, request)
-
-
 class CardStatus(object):
     """
     List of statuses we return to the game for various reasons

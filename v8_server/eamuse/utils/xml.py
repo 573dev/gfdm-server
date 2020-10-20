@@ -1,7 +1,27 @@
 from datetime import datetime
-from typing import Optional
+from typing import Dict, Optional
 
 from lxml import etree
+
+
+class XMLBinTypes(object):
+    s8 = "s8"
+    u8 = "u8"
+    s16 = "s16"
+    u16 = "u16"
+    s32 = "s32"
+    u32 = "u32"
+    s64 = "s64"
+    u64 = "u64"
+    ip4 = "ip4"
+    time = "time"
+
+
+def e_type(_type, count: Optional[int] = None) -> Dict[str, str]:
+    result = {"__type": _type}
+    if count is not None:
+        result["__count"] = str(count)
+    return result
 
 
 def get_xml_tag(xml: etree) -> str:
