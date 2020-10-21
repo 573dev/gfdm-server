@@ -7,6 +7,7 @@ from sqlalchemy.orm.exc import MultipleResultsFound
 from v8_server import app
 from v8_server.eamuse.services import (
     Facility,
+    Local,
     Message,
     Package,
     PCBEvent,
@@ -287,53 +288,26 @@ def cardmng() -> Tuple[bytes, Dict[str, str]]:
     else:
         response = base_response(module)
     return eamuse_prepare_xml(response, request)
-
-
-@app.route("/local/service", methods=["POST"])
-def local() -> Tuple[bytes, Dict[str, str]]:
-    """
-    This is probably a big chunk of implementation. Handle all "local" service requests
-    which might have a whole bunch of stuff going on
-    """
-
-    xml, model, module, method, command = eamuse_read_xml(request)
-
-    if module == "shopinfo":
-        if method == "regist":
-            response = E.response(
-                E.shopinfo(
-                    E.data(
-                        E.cabid("1", e_type("u32")),
-                        E.locationid("nowhere"),
-                        E.is_send("1", e_type("u8")),
-                    )
-                )
-            )
-    elif module == "demodata":
-        # TODO: Not really sure what to return here
-        if method == "get":
-            response = base_response(module)
-    elif module == "cardutil":
-        # TODO: Not really sure what to return here
-        if method == "check":
-            # Return the users game information
-
-            # If the user doesn't have any game information yet:
-            response = E.response(
-                E.cardutil(E.card(E.kind("0", e_type("s8")), {"no": "1", "state": "0"}))
-            )
-
-            # Else get the user info and send that you idiot
-    else:
-        response = base_response(module)
-
-    return eamuse_prepare_xml(response, request)
-
 '''
 
 
+@Services.route(ServiceType.LOCAL)
+def local_service() -> FlaskResponse:
+    req = ServiceRequest(request)
+
+    if req.module == Local.SHOPINFO:
+        response = Local.shopinfo(req)
+    elif req.module == Local.DEMODATA:
+        response = Local.demodata(req)
+    elif req.module == Local.CARDUTIL:
+        response = Local.cardutil(req)
+    else:
+        raise Exception(f"Not sure how to handle this Local Request: {req}")
+    return req.response(response)
+
+
 @app.route(Services.SERVICES_ROUTE, methods=["POST"])
-def services_service() -> Tuple[bytes, Dict[str, str]]:
-    s_req = ServiceRequest(request)
+def services_service() -> FlaskResponse:
+    req = ServiceRequest(request)
     services = Services().get_services()
-    return s_req.response(services)
+    return req.response(services)
