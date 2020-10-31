@@ -9,6 +9,7 @@ DOCS_DEPS = ["sphinx", "sphinx-rtd-theme", "sphinx-autoapi", "recommonmark"]
 CHECK_DEPS = ["isort", "flake8", "flake8-quotes", "pep8-naming", "mypy", "black"]
 REQUIREMENTS = [
     "flask",
+    "flask_sqlalchemy",
     "watchdog",
     "pyopenssl",
     "lxml",

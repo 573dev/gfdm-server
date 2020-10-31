@@ -5,18 +5,12 @@ from pathlib import Path
 from typing import Optional, Union
 
 from flask import Flask, has_request_context, request
+from flask_sqlalchemy import SQLAlchemy
 
 from v8_server.config import Development, Production
-from v8_server.model.connection import Base, Database
-from v8_server.model.user import User
 from v8_server.utils.flask import generate_secret_key
 
 from .version import __version__
-
-
-# Make sure the database has been created
-with Database() as db:
-    Base.metadata.create_all(db.engine)
 
 
 class RequestFormatter(logging.Formatter):
@@ -117,9 +111,13 @@ static_dir = str(package_dir / "static")
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.secret_key = generate_secret_key(config.SECRET_KEY_FILENAME)
 app.config.from_object(config)
+db = SQLAlchemy(app)
+
+# Make sure the database has been created
+db.create_all()
 
 # We need to import the views here specifically once the flask app has been initialized
 import v8_server.view  # noqa: F401, E402
 
 
-__all__ = ["__version__", "app", "LOG_PATH"]
+__all__ = ["__version__", "app", "db", "LOG_PATH"]

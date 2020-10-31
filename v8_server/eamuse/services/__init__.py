@@ -1,3 +1,4 @@
+from v8_server.eamuse.services.cardmng import CardMng
 from v8_server.eamuse.services.facility import Facility
 from v8_server.eamuse.services.local import Local
 from v8_server.eamuse.services.message import Message
@@ -8,6 +9,7 @@ from v8_server.eamuse.services.services import ServiceRequest, Services, Service
 
 
 __all__ = [
+    "CardMng",
     "Facility",
     "Local",
     "Message",

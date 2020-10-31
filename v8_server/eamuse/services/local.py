@@ -22,6 +22,9 @@ class Local(object):
     CARDUTIL = "cardutil"
     CARDUTIL_CHECK = "check"
 
+    GAMEINFO = "gameinfo"
+    GAMEINFO_GET = "get"
+
     @classmethod
     def shopinfo(cls, req: ServiceRequest) -> etree:
         """
@@ -125,7 +128,26 @@ class Local(object):
         # TODO: Figure out what this thing actually needs to send back
 
         if req.method == cls.DEMODATA_GET:
-            response = E.response(E.demodata({"expire": "600"}))
+            # response = E.response(E.demodata({"expire": "600"}))
+
+            # try some dummy response that might have some info in it
+            response = E.response(
+                E.demodata(
+                    E.hitchart({"nr": "3"}),
+                    E.data(
+                        E.musicid("133", e_type(T.s32)),
+                        E.last1("1", e_type(T.s32)),
+                    ),
+                    E.data(
+                        E.musicid("208", e_type(T.s32)),
+                        E.last1("2", e_type(T.s32)),
+                    ),
+                    E.data(
+                        E.musicid("209", e_type(T.s32)),
+                        E.last1("3", e_type(T.s32)),
+                    ),
+                )
+            )
         else:
             raise Exception(
                 "Not sure how to handle this demodata request. "
@@ -153,7 +175,7 @@ class Local(object):
             <response>
                 <cardutil>
                     <card no="1" state="0">
-                        <kind __type="s8")0</kind>
+                        <kind __type="s8">0</kind>
                     </card>
                 </cardutil>
             </response>
@@ -167,6 +189,38 @@ class Local(object):
         else:
             raise Exception(
                 "Not sure how to handle this cardutil request. "
+                f'method "{req.method}" is unknown for request: {req}'
+            )
+
+        return response
+
+    @classmethod
+    def gameinfo(cls, req: ServiceRequest) -> etree:
+        """
+        Handle a Gameinfo request.
+
+        Currently unsure how to handle this, so we just return a dummy object.
+
+        # Example Request:
+            <call model="K32:J:B:A:2011033000" srcid="00010203040506070809">
+                <gameinfo method="get">
+                    <shop>
+                        <locationid __type="str">US-123</locationid>
+                        <cabid __type="u32">1</cabid>
+                    </shop>
+                </gameinfo>
+            </call>
+
+        Example Response:
+            <response>
+                <gameinfo expire="600"/>
+            </response>
+        """
+        if req.method == cls.GAMEINFO_GET:
+            response = E.response(E.gameinfo())
+        else:
+            raise Exception(
+                "Not sure how to handle this gameinfo request. "
                 f'method "{req.method}" is unknown for request: {req}'
             )
 

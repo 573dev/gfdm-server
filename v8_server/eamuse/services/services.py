@@ -36,6 +36,23 @@ class ServiceType(IntEnum):
     CARDMNG = 6
     LOCAL = 7
 
+    # Extra for testing
+    # BINARY = 8
+    # DLSTATUS = 9
+    # EACOIN = 10
+    # EEMALL = 11
+    # INFO = 12
+    # LOBBY = 13
+    # NETLOG = 14
+    # NUMBERING = 15
+    # PKGLIST = 16
+    # POSEVENT = 17
+    # REFERENCE = 18
+    # SHOPINF = 19
+    # SIDMGR = 20
+    # USERDATA = 21
+    # USERID = 22
+
 
 class Services(object):
     """
