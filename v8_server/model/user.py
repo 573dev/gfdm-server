@@ -6,7 +6,7 @@ from typing import Optional
 from flask_sqlalchemy.model import DefaultMeta
 from sqlalchemy import JSON, Column, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import Integer, String
+from sqlalchemy.types import Boolean, Integer, String
 
 from v8_server import db
 
@@ -27,9 +27,10 @@ class User(BaseModel):
 
     userid = Column(Integer, nullable=False, primary_key=True)
     pin = Column(String(4), nullable=False)
-    cards = relationship("Card", back_populates="user")
+    card = relationship("Card", uselist=False, back_populates="user")
     extids = relationship("ExtID", back_populates="user")
     refids = relationship("RefID", back_populates="user")
+    user_account = relationship("UserAccount", uselist=False, back_populates="user")
 
     def __repr__(self) -> str:
         return f'User<userid: {self.userid}, pin: "{self.pin}">'
@@ -38,6 +39,25 @@ class User(BaseModel):
     def from_cardid(cls, cardid: str) -> Optional[User]:
         card = db.session.query(Card).filter(Card.cardid == cardid).one_or_none()
         return card.user if card is not None else None
+
+    @classmethod
+    def from_refid(cls, refid: str) -> Optional[User]:
+        ref = db.session.query(RefID).filter(RefID.refid == refid).one_or_none()
+        return ref.user if ref is not None else None
+
+
+class UserAccount(BaseModel):
+    """
+    Table representing a user account.
+    """
+
+    __tablename__ = "user_accounts"
+
+    userid = Column(Integer, ForeignKey("users.userid"), primary_key=True)
+    name = Column(String(8), nullable=False)
+    chara = Column(Integer, nullable=False)
+    is_succession = Column(Boolean, nullable=False)
+    user = relationship("User", back_populates="user_account")
 
 
 class Card(BaseModel):
@@ -51,7 +71,7 @@ class Card(BaseModel):
 
     cardid = Column(String(16), nullable=False, primary_key=True)
     userid = Column(Integer, ForeignKey("users.userid"), nullable=False)
-    user = relationship("User", back_populates="cards")
+    user = relationship("User", back_populates="card")
 
     def __repr__(self) -> str:
         return f'Card<cardid: "{self.cardid}", userid: {self.userid}>'
@@ -64,7 +84,7 @@ class ExtID(BaseModel):
     """
 
     __tablename__ = "extids"
-    __table_args_ = (UniqueConstraint("game", "userid", name="game_userid"),)
+    __table_args__ = (UniqueConstraint("game", "userid", name="game_userid"),)
     extid = Column(Integer, nullable=False, primary_key=True)
     game = Column(String(32), nullable=False)
     userid = Column(Integer, ForeignKey("users.userid"), nullable=False)

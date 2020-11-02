@@ -38,20 +38,21 @@ class ServiceType(IntEnum):
 
     # Extra for testing
     # BINARY = 8
-    # DLSTATUS = 9
-    # EACOIN = 10
+    DLSTATUS = 9
+    EACOIN = 10
     # EEMALL = 11
     # INFO = 12
-    # LOBBY = 13
-    # NETLOG = 14
+    LOBBY = 13
+    NETLOG = 14
     # NUMBERING = 15
     # PKGLIST = 16
     # POSEVENT = 17
     # REFERENCE = 18
     # SHOPINF = 19
-    # SIDMGR = 20
-    # USERDATA = 21
-    # USERID = 22
+    SIDMGR = 20
+    USERDATA = 21
+    USERID = 22
+    TRACEROUTE = 23
 
 
 class Services(object):
@@ -66,7 +67,8 @@ class Services(object):
 
     # Default service url that GFDM uses. You will need to set up your network so that
     # this URL points to this server.
-    SERVICE_URL = "https://eamuse.konami.fun"
+    # SERVICE_URL = "https://eamuse.konami.fun"
+    SERVICE_URL = "https://e.k.f"
 
     # The base route that GFDM uses to query the eAmuse server to get the list of
     # offered services

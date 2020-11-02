@@ -107,3 +107,6 @@ ENV/
 /decompiled/
 /database/
 
+
+# Ignore this for now, not sure I want to just throw it up on github yet
+/v8_server/model/data/mdb.json

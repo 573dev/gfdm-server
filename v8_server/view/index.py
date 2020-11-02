@@ -145,6 +145,8 @@ def local_service() -> FlaskResponse:
         response = Local.cardutil(req)
     elif req.module == Local.GAMEINFO:
         response = Local.gameinfo(req)
+    elif req.module == Local.GAMEEND:
+        response = Local.gameend(req)
     else:
         raise Exception(f"Not sure how to handle this Local Request: {req}")
     return req.response(response)

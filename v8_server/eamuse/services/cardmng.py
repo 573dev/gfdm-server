@@ -63,7 +63,15 @@ class CardMng(object):
 
         if user is None:
             # The user doesn't exist, force system to create a new account
-            response = E.response(E.cardmng({"status": str(CardMng.NOT_REGISTERED)}))
+            response = E.response(
+                E.cardmng(
+                    {
+                        "newflag": "1",
+                        "binded": "0",
+                        "status": str(CardMng.NOT_REGISTERED),
+                    }
+                )
+            )
         else:
             refid = RefID.from_userid(user.userid)
             bound = Profile.from_userid(user.userid) is not None
@@ -76,12 +84,13 @@ class CardMng(object):
                     {
                         "refid": refid.refid,
                         "dataid": refid.refid,
-                        "newflag": "1",
+                        "newflag": "0",
                         "binded": "1" if bound else "0",
                         "expired": "0",
                         "exflag": "0",
                         "useridflag": "1",
                         "extidflag": "1",
+                        "status": str(CardMng.SUCCESS),
                     }
                 )
             )
