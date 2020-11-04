@@ -7,7 +7,7 @@ from lxml.builder import E
 from v8_server import db
 from v8_server.eamuse.services.services import ServiceRequest
 from v8_server.eamuse.utils.crc import calculate_crc8
-from v8_server.eamuse.utils.xml import XMLBinTypes as T, e_type
+from v8_server.eamuse.utils.xml import XMLBinTypes as T, e_type, fill
 from v8_server.model.song import HitChart
 from v8_server.model.user import User, UserAccount
 
@@ -307,22 +307,20 @@ class Local(object):
                         E.ext_premium_border("95", e_type(T.u8)),
                     ),
                     E.battledata(
-                        E.battle_music_level(
-                            " ".join("0" * 13), e_type(T.u8, count=13)
-                        ),
-                        E.standard_skill(" ".join("0" * 13), e_type(T.s32, count=13)),
-                        E.border_skill(" ".join("0" * 13), e_type(T.s32, count=13)),
+                        E.battle_music_level(fill(13), e_type(T.u8, count=13)),
+                        E.standard_skill(fill(13), e_type(T.s32, count=13)),
+                        E.border_skill(fill(13), e_type(T.s32, count=13)),
                     ),
                     E.quest(
                         E.division("0", e_type(T.u8)),
                         E.border("0", e_type(T.u8)),
-                        E.qdata(" ".join("0" * 26), e_type(T.u32, count=26)),
+                        E.qdata(fill(26), e_type(T.u32, count=26)),
                         *[
-                            E(f"play_{x}", " ".join("0" * 32), e_type(T.u32, count=32))
+                            E(f"play_{x}", fill(32), e_type(T.u32, count=32))
                             for x in range(0, 13)
                         ],
                         *[
-                            E(f"clear_{x}", " ".join("0" * 32), e_type(T.u32, count=32))
+                            E(f"clear_{x}", fill(32), e_type(T.u32, count=32))
                             for x in range(0, 13)
                         ],
                     ),
@@ -339,18 +337,221 @@ class Local(object):
 
     @classmethod
     def gametop(cls, req: ServiceRequest) -> etree:
+        refid = req.xml[0].find("player/refid").text
+        # kind = int(req.xml[0].find("player/request/kind").text)
+        # offset = int(req.xml[0].find("player/request/offset").text)
+        # music_nr = int(req.xml[0].find("player/request/music_nr").text)
+
+        user = User.from_refid(refid)
+        if user is None:
+            raise Exception(f"GameTop asking for invalid user with refid: {refid}")
+        account = user.user_account
 
         if req.method == cls.GAMETOP_GET:
-            pass
+            response = E.response(
+                E.gametop(
+                    E.player(
+                        E.player_type("0", e_type(T.u8)),
+                        E.my_rival_id("0"),
+                        E.mode("0", e_type(T.u8)),
+                        E.syogo_list(fill(200, value="-1"), e_type(T.s16, count=200)),
+                        E.badge_list(fill(200, value="-1"), e_type(T.s16, count=200)),
+                        E.favorite_music(fill(20, value="-1"), e_type(T.s16, count=20)),
+                        E.favorite_music_2(
+                            fill(20, value="-1"), e_type(T.s16, count=20)
+                        ),
+                        E.favorite_music_3(
+                            fill(20, value="-1"), e_type(T.s16, count=20)
+                        ),
+                        E.secret_music(fill(32), e_type(T.u16, count=32)),
+                        E.style("2097152", e_type(T.u32)),
+                        E.style_2("0", e_type(T.u32)),
+                        E.shutter_list("0", e_type(T.u32)),
+                        E.judge_logo_list("0", e_type(T.u32)),
+                        E.skin_list("0", e_type(T.u32)),
+                        E.movie_list("0", e_type(T.u32)),
+                        E.attack_effect_list("0", e_type(T.u32)),
+                        E.idle_screen("0", e_type(T.u32)),
+                        E.chance_point("0", e_type(T.s32)),
+                        E.failed_cnt("0", e_type(T.s32)),
+                        E.secret_chara("0", e_type(T.u32)),
+                        E.mode_beginner("0", e_type(T.u16)),
+                        E.mode_standard("0", e_type(T.u16)),
+                        E.mode_battle_global("0", e_type(T.u16)),
+                        E.mode_battle_local("0", e_type(T.u16)),
+                        E.mode_quest("0", e_type(T.u16)),
+                        E.v3_skill("-1", e_type(T.s32)),
+                        E.v4_skill("-1", e_type(T.s32)),
+                        E.old_ver_skill("-1", e_type(T.s32)),
+                        E.customize(
+                            E.shutter("0", e_type(T.u8)),
+                            E.info_level("0", e_type(T.u8)),
+                            E.name_disp("0", e_type(T.u8)),
+                            E.auto("0", e_type(T.u8)),
+                            E.random("0", e_type(T.u8)),
+                            E.judge_logo("0", e_type(T.u32)),
+                            E.skin("0", e_type(T.u32)),
+                            E.movie("0", e_type(T.u32)),
+                            E.attack_effect("0", e_type(T.u32)),
+                            E.layout("0", e_type(T.u8)),
+                            E.target_skill("0", e_type(T.u8)),
+                            E.comparison("0", e_type(T.u8)),
+                            E.meter_custom(fill(3), e_type(T.u8, count=3)),
+                        ),
+                        E.tag(str(calculate_crc8("0")), e_type(T.u8)),
+                        E.battledata(
+                            E.bp("0", e_type(T.u32)),
+                            E.battle_rate("0", e_type(T.s32)),
+                            E.battle_class("0", e_type(T.u8)),
+                            E.point("0", e_type(T.s16)),
+                            E.rensyo("0", e_type(T.u16)),
+                            E.win("0", e_type(T.u32)),
+                            E.lose("0", e_type(T.u32)),
+                            E.score_type("0", e_type(T.u8)),
+                            E.strategy_item("0", e_type(T.s16)),
+                            E.production_item("0", e_type(T.s16)),
+                            E.draw("0", e_type(T.u32)),
+                            E.max_class("0", e_type(T.u8)),
+                            E.max_rensyo("0", e_type(T.u16)),
+                            E.vip_rensyo("0", e_type(T.u16)),
+                            E.max_defeat_skill("0", e_type(T.s32)),
+                            E.max_defeat_battle_rate("0", e_type(T.s32)),
+                            E.gold_star("0", e_type(T.u32)),
+                            E.random_select("0", e_type(T.u32)),
+                            E.enable_bonus_bp("0", e_type(T.u8)),
+                            E.type_normal("0", e_type(T.u32)),
+                            E.type_perfect("0", e_type(T.u32)),
+                            E.type_combo("0", e_type(T.u32)),
+                            E.area_id_list(fill(60), e_type(T.u8, count=60)),
+                            E.area_win_list(fill(60), e_type(T.u32, count=60)),
+                            E.area_lose_list(fill(60), e_type(T.u32, count=60)),
+                            E.perfect("0", e_type(T.u32)),
+                            E.great("0", e_type(T.u32)),
+                            E.good("0", e_type(T.u32)),
+                            E.poor("0", e_type(T.u32)),
+                            E.miss("0", e_type(T.u32)),
+                            E.history(
+                                *[
+                                    E.round(
+                                        E.defeat_class("0", e_type(T.s8)),
+                                        E.rival_type("0", e_type(T.s8)),
+                                        E.name("0"),
+                                        E.shopname("0"),
+                                        E.chara_icon("0", e_type(T.u8)),
+                                        E.pref("0", e_type(T.u8)),
+                                        E.skill("0", e_type(T.s32)),
+                                        E.battle_rate("0", e_type(T.s32)),
+                                        E.syogo(fill(2), e_type(T.s16, count=2)),
+                                        E.result("0", e_type(T.s8)),
+                                        E.seqmode(fill(2), e_type(T.s8, count=2)),
+                                        E.score_type(fill(2), e_type(T.s8, count=2)),
+                                        E.musicid(fill(2), e_type(T.s32, count=2)),
+                                        E.flags(fill(2), e_type(T.u32, count=2)),
+                                        E.score_diff(fill(2), e_type(T.s32, count=2)),
+                                        E.item(fill(2), e_type(T.s16, count=2)),
+                                        E.select_type(fill(2), e_type(T.s8, count=2)),
+                                        E.gold_star_hist("0", e_type(T.u8)),
+                                        {"before": "0"},
+                                    )
+                                    for _ in range(0, 10)
+                                ],
+                            ),
+                            E.music_hist(
+                                *[
+                                    E.round(
+                                        E.point("0", e_type(T.s16)),
+                                        E.my_select_musicid("0", e_type(T.s32)),
+                                        E.my_select_result("0", e_type(T.s8)),
+                                        E.rival_select_musicid("0", e_type(T.s32)),
+                                        E.rival_select_result("0", e_type(T.s8)),
+                                        {"before": "0"},
+                                    )
+                                    for _ in range(0, 20)
+                                ],
+                            ),
+                        ),
+                        E.battle_aniv(
+                            E.get(
+                                E.category_ver(fill(11), e_type(T.u16, count=11)),
+                                E.category_genre(fill(11), e_type(T.u16, count=11)),
+                            ),
+                        ),
+                        E.info(
+                            E.mode("0", e_type(T.u32)),
+                            E.boss("0", e_type(T.u32)),
+                            E.battle_aniv("0", e_type(T.u32)),
+                            E.free_music("0", e_type(T.u32)),
+                            E.free_chara("0", e_type(T.u32)),
+                            E.event("0", e_type(T.u32)),
+                            E.battle_event("0", e_type(T.u32)),
+                            E.champ("0", e_type(T.u32)),
+                            E.item("0", e_type(T.u32)),
+                            E.quest("0", e_type(T.u32)),
+                            E.campaign("0", e_type(T.u32)),
+                            E.gdp("0", e_type(T.u32)),
+                            E.v7("0", e_type(T.u32)),
+                        ),
+                        E.quest(
+                            E.quest_rank("0", e_type(T.u8)),
+                            E.star("0", e_type(T.u32)),
+                            E.fan("0", e_type(T.u64)),
+                            E.qdata(fill(39), e_type(T.u32, count=39)),
+                            E.test_data(fill(12), e_type(T.u32, count=12)),
+                        ),
+                        E.championship(E.playable(fill(4), e_type(T.s32, count=4))),
+                        E.ranking(
+                            E.skill_rank("0", e_type(T.s32)),
+                        ),
+                        E.rival_id_1("", e_type(T.str, count=1)),
+                        E.rival_id_2("", e_type(T.str, count=1)),
+                        E.rival_id_3("", e_type(T.str, count=1)),
+                        E.standard({"nr": "0"}),
+                        E.finish("1", e_type(T.u8)),
+                        {"no": "1"},
+                    )
+                )
+            )
         elif req.method == cls.GAMETOP_GET_RIVAL:
-            pass
+            response = E.response(
+                E.gametop(
+                    E.player(
+                        E.pdata(
+                            E.name(account.name),
+                            E.chara(str(account.chara), e_type(T.u8)),
+                            E.skill("0", e_type(T.s32)),
+                            E.syogo(fill(2), e_type(T.s16, count=2)),
+                            E.info_level("0", e_type(T.u8)),
+                            E.bdata(
+                                E.battle_rate("0", e_type(T.s32)),
+                                E.battle_class("0", e_type(T.u8)),
+                                E.point("0", e_type(T.s16)),
+                                E.rensyo("0", e_type(T.u16)),
+                                E.win("0", e_type(T.u32)),
+                                E.lose("0", e_type(T.u32)),
+                                E.draw("0", e_type(T.u32)),
+                            ),
+                            E.quest(
+                                E.quest_rank("0", e_type(T.u8)),
+                                E.star("0", e_type(T.u32)),
+                                E.fan("0", e_type(T.u64)),
+                                E.qdata(fill(13), e_type(T.u32, count=13)),
+                                E.test_data(fill(12), e_type(T.u32, count=12)),
+                            ),
+                            {"rival_id": "0"},
+                        ),
+                        E.standard({"nr": "0"}),
+                        E.finish("1", e_type(T.u8)),
+                        {"no": "1"},
+                    )
+                )
+            )
         else:
             raise Exception(
                 "Not sure how to handle this gametop request. "
                 f'method "{req.method}" is unknown for request: {req}'
             )
 
-        return request
+        return response
 
     @classmethod
     def gameend(cls, req: ServiceRequest) -> etree:

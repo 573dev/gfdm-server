@@ -4,6 +4,10 @@ from typing import Dict, Optional
 from lxml import etree
 
 
+def fill(count: int, value: str = "0") -> str:
+    return " ".join(value for _ in range(0, count))
+
+
 class XMLBinTypes(object):
     s8 = "s8"
     u8 = "u8"
@@ -15,6 +19,7 @@ class XMLBinTypes(object):
     u64 = "u64"
     ip4 = "ip4"
     time = "time"
+    str = "str"
 
 
 def e_type(_type, count: Optional[int] = None) -> Dict[str, str]:

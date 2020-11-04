@@ -1,12 +1,11 @@
-import random
 from typing import Dict, Tuple
 
 from flask import request
-from sqlalchemy.orm.exc import MultipleResultsFound
 
 from v8_server import app
 from v8_server.eamuse.services import (
     CardMng,
+    DLStatus,
     Facility,
     Local,
     Message,
@@ -17,8 +16,6 @@ from v8_server.eamuse.services import (
     Services,
     ServiceType,
 )
-from v8_server.eamuse.utils.xml import get_xml_attrib
-from v8_server.model.user import Card, ExtID, Profile, RefID, User
 
 
 FlaskResponse = Tuple[bytes, Dict[str, str]]
@@ -111,8 +108,20 @@ def facility_service() -> FlaskResponse:
     return req.response(response)
 
 
+@Services.route(ServiceType.DLSTATUS)
+def dlstatus_service() -> FlaskResponse:
+    req = ServiceRequest(request)
+
+    if req.method == DLStatus.PROGRESS:
+        response = DLStatus.progress()
+    else:
+        raise Exception(f"Not sure how to handle this DLStatus Request: {req}")
+
+    return req.response(response)
+
+
 @Services.route(ServiceType.CARDMNG)
-def cardmng() -> Tuple[bytes, Dict[str, str]]:
+def cardmng_service() -> FlaskResponse:
     req = ServiceRequest(request)
 
     if req.method == CardMng.INQUIRE:
@@ -147,6 +156,8 @@ def local_service() -> FlaskResponse:
         response = Local.gameinfo(req)
     elif req.module == Local.GAMEEND:
         response = Local.gameend(req)
+    elif req.module == Local.GAMETOP:
+        response = Local.gametop(req)
     else:
         raise Exception(f"Not sure how to handle this Local Request: {req}")
     return req.response(response)
