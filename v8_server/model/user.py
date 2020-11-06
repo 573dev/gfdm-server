@@ -59,6 +59,11 @@ class UserAccount(BaseModel):
     is_succession = Column(Boolean, nullable=False)
     user = relationship("User", back_populates="user_account")
 
+    @classmethod
+    def from_userid(cls, userid: int) -> Optional[UserAccount]:
+        q = db.session.query(UserAccount).filter(UserAccount.userid == userid)
+        return q.one_or_none()
+
 
 class Card(BaseModel):
     """

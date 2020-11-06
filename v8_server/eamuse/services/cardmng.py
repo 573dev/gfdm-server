@@ -3,7 +3,7 @@ from lxml.builder import E
 from v8_server import db
 from v8_server.eamuse.services.services import ServiceRequest
 from v8_server.eamuse.utils.xml import get_xml_attrib
-from v8_server.model.user import Card, Profile, RefID, User
+from v8_server.model.user import Card, Profile, RefID, User, UserAccount
 
 
 class CardMng(object):
@@ -74,7 +74,7 @@ class CardMng(object):
             )
         else:
             refid = RefID.from_userid(user.userid)
-            bound = Profile.from_userid(user.userid) is not None
+            bound = UserAccount.from_userid(user.userid) is not None
 
             if refid is None:
                 raise Exception("RefID Should not be None here!")

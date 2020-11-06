@@ -7,7 +7,7 @@ from lxml.builder import E
 from v8_server import db
 from v8_server.eamuse.services.services import ServiceRequest
 from v8_server.eamuse.utils.crc import calculate_crc8
-from v8_server.eamuse.utils.xml import XMLBinTypes as T, e_type, fill
+from v8_server.eamuse.utils.xml import XMLBinTypes as T, e_type, fill, get_xml_attrib
 from v8_server.model.song import HitChart
 from v8_server.model.user import User, UserAccount
 
@@ -229,9 +229,35 @@ class Local(object):
         # TODO: Figure out what this thing actually needs to send back
 
         if req.method == cls.CARDUTIL_CHECK:
-            response = E.response(
-                E.cardutil(E.card(E.kind("0", e_type(T.s8)), {"no": "1", "state": "0"}))
-            )
+            refid = req.xml[0].find("card/refid").text
+            user = User.from_refid(refid)
+
+            if user is None:
+                response = E.response(
+                    E.cardutil(
+                        E.card(E.kind("0", e_type(T.s8)), {"no": "1", "state": "0"})
+                    )
+                )
+            else:
+                account = UserAccount.from_userid(user.userid)
+                if account is None:
+                    raise Exception("Account is none, wut?")
+
+                response = E.response(
+                    E.cardutil(
+                        E.card(
+                            E.kind("0", e_type(T.s8)),
+                            E.name(account.name),
+                            E.gdp("0", e_type(T.u32)),
+                            E.skill("0", e_type(T.s32)),
+                            E.all_skill("0", e_type(T.s32)),
+                            E.chara(str(account.chara), e_type(T.u8)),
+                            E.syogo(fill(2), e_type(T.s16, count=2)),
+                            E.penalty("0", e_type(T.u8)),
+                            {"no": "1", "state": "2"},
+                        )
+                    )
+                )
         elif req.method == cls.CARDUTIL_REGIST:
             root = req.xml[0].find("data")
             refid = root.find("refid").text
@@ -560,6 +586,8 @@ class Local(object):
 
         For now just save the hitchart data
         """
+        dtfmt = "%Y-%m-%d %H:%M:%S%z"
+
         if req.method == cls.GAMEEND_REGIST:
             # Grab the hitchart data
             hc_root = req.xml[0].find("hitchart")
@@ -572,7 +600,119 @@ class Local(object):
             db.session.commit()
 
             # Just send back a dummy object for now
-            response = E.response(E.gameend())
+            gamemode = get_xml_attrib(req.xml[0].find("gamemode"), "game_mode")
+            card = get_xml_attrib(req.xml[0].find("player"), "card")
+            no = get_xml_attrib(req.xml[0].find("player"), "no")
+            response = E.response(
+                E.gameend(
+                    E.gamemode({"mode": gamemode}),
+                    E.player(
+                        E.skill(
+                            E.point("0", e_type(T.s32)),
+                            E.rank("1", e_type(T.u32)),
+                            E.total_nr("1", e_type(T.u32)),
+                            E.all_point("0", e_type(T.s32)),
+                            E.all_rank("1", e_type(T.u32)),
+                            E.all_total_nr("1", e_type(T.u32)),
+                        ),
+                        E.registered_other_num("0", e_type(T.u32)),
+                        E.xg_play_cnt("0", e_type(T.u32)),
+                        E.play_cnt("0", e_type(T.u32)),
+                        E.sess_cnt("0", e_type(T.u32)),
+                        E.encore_play("0", e_type(T.u32)),
+                        E.premium_play("0", e_type(T.u32)),
+                        E.now_time(datetime.now().strftime(dtfmt)),
+                        E.kikan_event("0", e_type(T.u32)),
+                        E.vip_rensyo("0", e_type(T.u16)),
+                        E.all_play_mode("0", e_type(T.u8)),
+                        E.play_shop_num("0", e_type(T.u8)),
+                        E.judge_perfect("0", e_type(T.u32)),
+                        E.is_v5_goodplayer("0", e_type(T.u8)),
+                        E.max_clear_difficulty("0", e_type(T.s8)),
+                        E.max_fullcombo_difficulty("0", e_type(T.s8)),
+                        E.max_excellent_difficulty("0", e_type(T.s8)),
+                        E.battledata(
+                            E.bp("0", e_type(T.u32)),
+                            E.battle_rate("0", e_type(T.s32)),
+                            E.battle_class("0", e_type(T.u8)),
+                            E.point("0", e_type(T.s16)),
+                            E.rensyo("0", e_type(T.u16)),
+                            E.win("0", e_type(T.u32)),
+                            E.lose("0", e_type(T.u32)),
+                            E.score_type("0", e_type(T.u8)),
+                            E.strategy_item("0", e_type(T.s16)),
+                            E.production_item("0", e_type(T.s16)),
+                            E.draw("0", e_type(T.u32)),
+                            E.max_class("0", e_type(T.u8)),
+                            E.max_rensyo("0", e_type(T.u16)),
+                            E.vip_rensyo("0", e_type(T.u16)),
+                            E.max_defeat_skill("0", e_type(T.s32)),
+                            E.max_defeat_battle_rate("0", e_type(T.s32)),
+                            E.gold_star("0", e_type(T.u32)),
+                            E.random_select("0", e_type(T.u32)),
+                            E.enable_bonus_bp("0", e_type(T.u8)),
+                            E.type_normal("0", e_type(T.u32)),
+                            E.type_perfect("0", e_type(T.u32)),
+                            E.type_combo("0", e_type(T.u32)),
+                            E.area_id_list(fill(60), e_type(T.u8, count=60)),
+                            E.area_win_list(fill(60), e_type(T.u32, count=60)),
+                            E.area_lose_list(fill(60), e_type(T.u32, count=60)),
+                            E.perfect("0", e_type(T.u32)),
+                            E.great("0", e_type(T.u32)),
+                            E.good("0", e_type(T.u32)),
+                            E.poor("0", e_type(T.u32)),
+                            E.miss("0", e_type(T.u32)),
+                            E.history(
+                                *[
+                                    E.round(
+                                        E.defeat_class("0", e_type(T.s8)),
+                                        E.rival_type("0", e_type(T.s8)),
+                                        E.name("0"),
+                                        E.shopname("0"),
+                                        E.chara_icon("0", e_type(T.u8)),
+                                        E.pref("0", e_type(T.u8)),
+                                        E.skill("0", e_type(T.s32)),
+                                        E.battle_rate("0", e_type(T.s32)),
+                                        E.syogo(fill(2), e_type(T.s16, count=2)),
+                                        E.result("0", e_type(T.s8)),
+                                        E.seqmode(fill(2), e_type(T.s8, count=2)),
+                                        E.score_type(fill(2), e_type(T.s8, count=2)),
+                                        E.musicid(fill(2), e_type(T.s32, count=2)),
+                                        E.flags(fill(2), e_type(T.u32, count=2)),
+                                        E.score_diff(fill(2), e_type(T.s32, count=2)),
+                                        E.item(fill(2), e_type(T.s16, count=2)),
+                                        E.select_type(fill(2), e_type(T.s8, count=2)),
+                                        E.gold_star_hist("0", e_type(T.u8)),
+                                        {"before": "0"},
+                                    )
+                                    for _ in range(0, 10)
+                                ],
+                            ),
+                            E.music_hist(
+                                *[
+                                    E.round(
+                                        E.point("0", e_type(T.s16)),
+                                        E.my_select_musicid("0", e_type(T.s32)),
+                                        E.my_select_result("0", e_type(T.s8)),
+                                        E.rival_select_musicid("0", e_type(T.s32)),
+                                        E.rival_select_result("0", e_type(T.s8)),
+                                        {"before": "0"},
+                                    )
+                                    for _ in range(0, 20)
+                                ],
+                            ),
+                        ),
+                        E.quest(
+                            E.quest_rank("0", e_type(T.u8)),
+                            E.star("0", e_type(T.u32)),
+                            E.fan("0", e_type(T.u64)),
+                            E.qdata(fill(39), e_type(T.u32, count=39)),
+                        ),
+                        E.championship(E.playable(fill(4), e_type(T.u32, count=4))),
+                        {"card": card, "no": no},
+                    ),
+                )
+            )
         else:
             raise Exception(
                 "Not sure how to handle this gameend request. "
