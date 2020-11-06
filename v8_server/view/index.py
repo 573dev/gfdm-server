@@ -158,6 +158,8 @@ def local_service() -> FlaskResponse:
         response = Local.gameend(req)
     elif req.module == Local.GAMETOP:
         response = Local.gametop(req)
+    elif req.module == Local.CUSTOMIZE:
+        response = Local.customize(req)
     else:
         raise Exception(f"Not sure how to handle this Local Request: {req}")
     return req.response(response)

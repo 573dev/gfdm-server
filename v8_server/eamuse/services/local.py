@@ -56,6 +56,18 @@ class Local(object):
     INCREMENT = "increment"
 
     @classmethod
+    def customize(cls, req: ServiceRequest) -> etree:
+        if req.method == cls.CUSTOMIZE_REGIST:
+            response = E.response(E.customize(E.player({"no": "1", "state": "2"})))
+        else:
+            raise Exception(
+                "Not sure how to handle this customize request. "
+                f'method "{req.method}" is unknown for request: {req}'
+            )
+
+        return response
+
+    @classmethod
     def shopinfo(cls, req: ServiceRequest) -> etree:
         """
         Handle the shopinfo request
@@ -631,6 +643,7 @@ class Local(object):
                         E.max_clear_difficulty("0", e_type(T.s8)),
                         E.max_fullcombo_difficulty("0", e_type(T.s8)),
                         E.max_excellent_difficulty("0", e_type(T.s8)),
+                        E.rival_data(),
                         E.battledata(
                             E.bp("0", e_type(T.u32)),
                             E.battle_rate("0", e_type(T.s32)),
@@ -650,13 +663,19 @@ class Local(object):
                             E.max_defeat_battle_rate("0", e_type(T.s32)),
                             E.gold_star("0", e_type(T.u32)),
                             E.random_select("0", e_type(T.u32)),
-                            E.enable_bonus_bp("0", e_type(T.u8)),
                             E.type_normal("0", e_type(T.u32)),
                             E.type_perfect("0", e_type(T.u32)),
                             E.type_combo("0", e_type(T.u32)),
+                            E.battle_aniv(
+                                E.get(
+                                    E.category_ver(fill(11), e_type(T.u16, count=11)),
+                                    E.category_genre(fill(11), e_type(T.u16, count=11)),
+                                ),
+                            ),
                             E.area_id_list(fill(60), e_type(T.u8, count=60)),
                             E.area_win_list(fill(60), e_type(T.u32, count=60)),
                             E.area_lose_list(fill(60), e_type(T.u32, count=60)),
+                            E.area_draw_list(fill(60), e_type(T.u32, count=60)),
                             E.perfect("0", e_type(T.u32)),
                             E.great("0", e_type(T.u32)),
                             E.good("0", e_type(T.u32)),
@@ -708,7 +727,7 @@ class Local(object):
                             E.fan("0", e_type(T.u64)),
                             E.qdata(fill(39), e_type(T.u32, count=39)),
                         ),
-                        E.championship(E.playable(fill(4), e_type(T.u32, count=4))),
+                        E.championship(E.playable(fill(4), e_type(T.s32, count=4))),
                         {"card": card, "no": no},
                     ),
                 )
