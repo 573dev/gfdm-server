@@ -244,17 +244,16 @@ class Local(object):
             refid = req.xml[0].find("card/refid").text
             user = User.from_refid(refid)
 
-            if user is None:
+            if (
+                user is None
+                or (account := UserAccount.from_userid(user.userid)) is None
+            ):
                 response = E.response(
                     E.cardutil(
                         E.card(E.kind("0", e_type(T.s8)), {"no": "1", "state": "0"})
                     )
                 )
             else:
-                account = UserAccount.from_userid(user.userid)
-                if account is None:
-                    raise Exception("Account is none, wut?")
-
                 response = E.response(
                     E.cardutil(
                         E.card(

@@ -1,5 +1,3 @@
-from lxml.builder import E
-
 from v8_server import db
 from v8_server.eamuse.services.services import ServiceRequest
 from v8_server.eamuse.xml.utils import (
@@ -8,6 +6,7 @@ from v8_server.eamuse.xml.utils import (
     load_xml_template,
 )
 from v8_server.model.user import Card, Profile, RefID, User, UserAccount
+from v8_server.utils.convert import bool_to_int as btoi
 
 
 class CardStatus(object):
@@ -76,7 +75,7 @@ class CardMng(object):
 
             args["refid"] = refid.refid
             args["newflag"] = 0
-            args["binded"] = bound
+            args["binded"] = btoi(bound)
             args["status"] = CardStatus.SUCCESS
 
         result = load_xml_template("cardmng", "inquire", args)

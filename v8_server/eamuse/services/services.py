@@ -6,7 +6,7 @@ from datetime import datetime
 from enum import IntEnum
 from random import randint
 from time import time
-from typing import Any, Callable, Dict, Optional, Tuple, Union
+from typing import Dict, Optional, Tuple, Union
 
 from flask import Request
 from kbinxml import KBinXML
@@ -14,7 +14,7 @@ from lxml import etree
 from lxml.builder import E
 from lxml.etree import _Element as eElement
 
-from v8_server import LOG_PATH, app
+from v8_server import LOG_PATH
 from v8_server.eamuse.utils.arc4 import EAmuseARC4
 from v8_server.eamuse.utils.eamuse import Model
 from v8_server.eamuse.utils.lz77 import Lz77
@@ -35,34 +35,12 @@ class ServiceType(IntEnum):
     PACKAGE = 5
     CARDMNG = 6
     LOCAL = 7
-
-    # Extra for testing
-    # BINARY = 8
-    DLSTATUS = 9
-    EACOIN = 10
-    # EEMALL = 11
-    # INFO = 12
-    LOBBY = 13
-    NETLOG = 14
-    # NUMBERING = 15
-    # PKGLIST = 16
-    # POSEVENT = 17
-    # REFERENCE = 18
-    # SHOPINF = 19
-    SIDMGR = 20
-    USERDATA = 21
-    USERID = 22
-    TRACEROUTE = 23
+    DLSTATUS = 8
 
 
 class Services(object):
     """
     Handles a service request from the eAmuse Server
-
-    Example:
-        <call model="K32:J:B:A:2011033000" srcid="00010203040506070809">
-            <services method="get"/>
-        </call>
     """
 
     # Default service url that GFDM uses. You will need to set up your network so that
@@ -72,12 +50,15 @@ class Services(object):
 
     # The base route that GFDM uses to query the eAmuse server to get the list of
     # offered services
-    SERVICES_ROUTE = "/service/services/services/"
+    SERVICES_ROUTE = "/services/"
+
+    # The custom route that we tell GFDM to use to query the eAmuse server
+    SERVICE_ROUTE = "/service"
 
     # Default NTP url
     # XXX: Maybe needs to be configurable? What if the machine this is running on
     # doesn't have internet access?
-    NTP_URL = "ntp//pool.ntp.org"
+    NTP_URL = "ntp://pool.ntp.org"
 
     def __init__(
         self,
@@ -113,19 +94,11 @@ class Services(object):
                 f"pa={ip}&ia={ip}&ga={ip}&ma={ip}&t1=2&t2=10"
             ),
             **{
-                n.lower(): f"{self.SERVICE_URL}/{m.value}"
+                n.lower(): f"{self.SERVICE_URL}/{self.SERVICE_ROUTE}/{m}/"
                 for n, m in ServiceType.__members__.items()
             },
         }
         return services
-
-    @classmethod
-    def route(cls, _type: ServiceType) -> Callable[[Any], Any]:
-        def decorator(f):
-            func = app.route(f"/{_type.value}", methods=["POST"])(f)
-            return func
-
-        return decorator
 
     def __repr__(self) -> str:
         return (

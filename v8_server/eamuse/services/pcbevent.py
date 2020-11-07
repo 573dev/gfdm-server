@@ -1,9 +1,13 @@
+import logging
 from datetime import datetime
 
 from lxml import etree
 from lxml.builder import E
 
 from v8_server.eamuse.services.services import ServiceRequest
+
+
+logger = logging.getLogger(__name__)
 
 
 class PCBEventItem(object):
@@ -80,13 +84,17 @@ class PCBEvent(object):
     PUT = "put"
 
     @classmethod
-    def put(cls):
+    def put(cls, req: ServiceRequest):
         """
         Example:
             <response>
                 <pcbevent expire="600"/>
             </response>
         """
+        # Log the event
+        event = PCBEvent(req)
+        logger.info(event)
+
         return E.response(E.pcbevent({"expire": "600"}))
 
     def __repr__(self) -> str:

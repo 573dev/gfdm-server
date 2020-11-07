@@ -46,122 +46,78 @@ def catch_all(u_path: str) -> str:
     return "You want path: %s" % u_path
 
 
-@Services.route(ServiceType.PCBTRACKER)
-def pcbtracker_service() -> FlaskResponse:
+@app.route(f"{Services.SERVICE_ROUTE}/<int:route>/", methods=["POST"])
+def service_service(route: int) -> FlaskResponse:
+    # TODO: Ideally we want to simplify this where we send the request to some method
+    # that handles checking the module/method/etc and dispaches it to the correct
+    # function rather than having this if chain in here. I'd like to keep the view as
+    # simple as possible
     req = ServiceRequest(request)
 
-    if req.method == PCBTracker.ALIVE:
-        response = PCBTracker.alive()
+    if route == ServiceType.PCBTRACKER.value:
+        if req.method == PCBTracker.ALIVE:
+            response = PCBTracker.alive()
+        else:
+            raise Exception(f"Not sure how to handle this PCBTracker Request: {req}")
+    elif route == ServiceType.MESSAGE.value:
+        if req.method == Message.GET:
+            response = Message.get()
+        else:
+            raise Exception(f"Not sure how to handle this Message Request: {req}")
+    elif route == ServiceType.PCBEVENT.value:
+        if req.method == PCBEvent.PUT:
+            response = PCBEvent.put(req)
+        else:
+            raise Exception(f"Not sure how to handle this PCBEvent Request: {req}")
+    elif route == ServiceType.PACKAGE.value:
+        if req.method == Package.LIST:
+            response = Package.list(req)
+        else:
+            raise Exception(f"Not sure how to handle this Package Request: {req}")
+    elif route == ServiceType.FACILITY.value:
+        if req.method == Facility.GET:
+            response = Facility.get()
+        else:
+            raise Exception(f"Not sure how to handle this Facility Request: {req}")
+    elif route == ServiceType.DLSTATUS.value:
+        if req.method == DLStatus.PROGRESS:
+            response = DLStatus.progress()
+        else:
+            raise Exception(f"Not sure how to handle this DLStatus Request: {req}")
+    elif route == ServiceType.CARDMNG.value:
+        if req.method == CardMng.INQUIRE:
+            response = CardMng.inquire(req)
+        elif req.method == CardMng.GETREFID:
+            response = CardMng.getrefid(req)
+        elif req.method == CardMng.AUTHPASS:
+            response = CardMng.authpass(req)
+        elif req.method == CardMng.BINDMODEL:
+            response = CardMng.bindmodel(req)
+        elif req.method == CardMng.GETKEEPSPAN:
+            response = CardMng.getkeepspan()
+        elif req.method == CardMng.GETDATALIST:
+            response = CardMng.getdatalist()
+        else:
+            raise Exception(f"Not sure how to handle this Cardmng Request: {req}")
+    elif route == ServiceType.LOCAL.value:
+        if req.module == Local.SHOPINFO:
+            response = Local.shopinfo(req)
+        elif req.module == Local.DEMODATA:
+            response = Local.demodata(req)
+        elif req.module == Local.CARDUTIL:
+            response = Local.cardutil(req)
+        elif req.module == Local.GAMEINFO:
+            response = Local.gameinfo(req)
+        elif req.module == Local.GAMEEND:
+            response = Local.gameend(req)
+        elif req.module == Local.GAMETOP:
+            response = Local.gametop(req)
+        elif req.module == Local.CUSTOMIZE:
+            response = Local.customize(req)
+        else:
+            raise Exception(f"Not sure how to handle this Local Request: {req}")
     else:
-        raise Exception(f"Not sure how to handle this PCBTracker Request: {req}")
-
-    return req.response(response)
-
-
-@Services.route(ServiceType.MESSAGE)
-def message_service() -> FlaskResponse:
-    req = ServiceRequest(request)
-
-    if req.method == Message.GET:
-        response = Message.get()
-    else:
-        raise Exception(f"Not sure how to handle this Message Request: {req}")
-
-    return req.response(response)
-
-
-@Services.route(ServiceType.PCBEVENT)
-def pcbevent_service() -> FlaskResponse:
-    req = ServiceRequest(request)
-    event = PCBEvent(req)
-    app.logger.info(event)
-
-    if req.method == PCBEvent.PUT:
-        response = PCBEvent.put()
-    else:
-        raise Exception(f"Not sure how to handle this PCBEvent Request: {req}")
-
-    return req.response(response)
-
-
-@Services.route(ServiceType.PACKAGE)
-def package_service() -> FlaskResponse:
-    req = ServiceRequest(request)
-
-    if req.method == Package.LIST:
-        response = Package.list(req)
-    else:
-        raise Exception(f"Not sure how to handle this Package Request: {req}")
-
-    return req.response(response)
-
-
-@Services.route(ServiceType.FACILITY)
-def facility_service() -> FlaskResponse:
-    req = ServiceRequest(request)
-
-    if req.method == Facility.GET:
-        response = Facility.get()
-    else:
-        raise Exception(f"Not sure how to handle this Facility Request: {req}")
-
-    return req.response(response)
-
-
-@Services.route(ServiceType.DLSTATUS)
-def dlstatus_service() -> FlaskResponse:
-    req = ServiceRequest(request)
-
-    if req.method == DLStatus.PROGRESS:
-        response = DLStatus.progress()
-    else:
-        raise Exception(f"Not sure how to handle this DLStatus Request: {req}")
-
-    return req.response(response)
-
-
-@Services.route(ServiceType.CARDMNG)
-def cardmng_service() -> FlaskResponse:
-    req = ServiceRequest(request)
-
-    if req.method == CardMng.INQUIRE:
-        response = CardMng.inquire(req)
-    elif req.method == CardMng.GETREFID:
-        response = CardMng.getrefid(req)
-    elif req.method == CardMng.AUTHPASS:
-        response = CardMng.authpass(req)
-    elif req.method == CardMng.BINDMODEL:
-        response = CardMng.bindmodel(req)
-    elif req.method == CardMng.GETKEEPSPAN:
-        response = CardMng.getkeepspan()
-    elif req.method == CardMng.GETDATALIST:
-        response = CardMng.getdatalist()
-    else:
-        raise Exception(f"Not sure how to handle this Cardmng Request: {req}")
-
-    return req.response(response)
-
-
-@Services.route(ServiceType.LOCAL)
-def local_service() -> FlaskResponse:
-    req = ServiceRequest(request)
-
-    if req.module == Local.SHOPINFO:
-        response = Local.shopinfo(req)
-    elif req.module == Local.DEMODATA:
-        response = Local.demodata(req)
-    elif req.module == Local.CARDUTIL:
-        response = Local.cardutil(req)
-    elif req.module == Local.GAMEINFO:
-        response = Local.gameinfo(req)
-    elif req.module == Local.GAMEEND:
-        response = Local.gameend(req)
-    elif req.module == Local.GAMETOP:
-        response = Local.gametop(req)
-    elif req.module == Local.CUSTOMIZE:
-        response = Local.customize(req)
-    else:
-        raise Exception(f"Not sure how to handle this Local Request: {req}")
+        raise Exception(f"Not sure how to handle this Request: {req}")
     return req.response(response)
 
 
