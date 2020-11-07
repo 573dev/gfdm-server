@@ -1,7 +1,7 @@
 from lxml.builder import E
 
 from v8_server.eamuse.services.services import ServiceRequest
-from v8_server.eamuse.utils.xml import get_xml_attrib
+from v8_server.eamuse.xml.utils import get_xml_attrib
 
 
 class Package(object):

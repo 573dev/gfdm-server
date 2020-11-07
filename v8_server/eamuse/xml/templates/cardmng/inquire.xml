@@ -1,0 +1,13 @@
+<response>
+    <cardmng
+        refid="{refid}"
+        dataid="{refid}"
+        newflag="{newflag}"
+        binded="{binded}"
+        expired="0"
+        exflag="0"
+        useridflag ="1"
+        extidflag="1"
+        status="{status}"
+    />
+</response>

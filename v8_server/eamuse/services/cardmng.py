@@ -2,8 +2,24 @@ from lxml.builder import E
 
 from v8_server import db
 from v8_server.eamuse.services.services import ServiceRequest
-from v8_server.eamuse.utils.xml import get_xml_attrib
+from v8_server.eamuse.xml.utils import (
+    drop_attributes,
+    get_xml_attrib,
+    load_xml_template,
+)
 from v8_server.model.user import Card, Profile, RefID, User, UserAccount
+
+
+class CardStatus(object):
+    """
+    Possible Card Status Values
+    """
+
+    SUCCESS = 0
+    NO_PROFILE = 109
+    NOT_ALLOWED = 110
+    NOT_REGISTERED = 112
+    INVALID_PIN = 116
 
 
 class CardMng(object):
@@ -12,13 +28,6 @@ class CardMng(object):
 
     This is for supporting eAmuse card interaction.
     """
-
-    # List of statuses we return to the game for various card related reasons
-    SUCCESS = 0
-    NO_PROFILE = 109
-    NOT_ALLOWED = 110
-    NOT_REGISTERED = 112
-    INVALID_PIN = 116
 
     # Methods
     INQUIRE = "inquire"
@@ -31,75 +40,59 @@ class CardMng(object):
     @classmethod
     def inquire(cls, req: ServiceRequest):
         """
-        Example Request:
-            <call model="K32:J:B:A:2011033000" srcid="00010203040506070809">
-                <cardmng
-                    cardid="E0040100DE52896C"
-                    cardtype="1"
-                    method="inquire"
-                    update="1"
-                />
-            </call>
+        Handle a Card Manage Inquire Request
 
-        Example Response:
-            <response>
-                <cardmng
-                    refid="ADE0FE0B14AEAEFC"
-                    dataid="ADE0FE0B14AEAEFC"
-                    newflag="1"
-                    binded="0"
-                    expired="0"
-                    ecflag="0"
-                    useridflag="1"
-                    extidflag="1"
-                />
-            </response>
+        Either the given card id is a brand new user, or a returning user.
+
+        Modifyable XML Text Replacements:
+            refid: The RefID.refid value for an existing user
+            newflag: Set to true for a new user, else 0
+            binded: Set to true if the user has a profile/account, else 0
+            status: See CardMng status consts at the top of this class
         """
+
         # Grab the card id
         cardid = get_xml_attrib(req.xml[0], "cardid")
+
+        # Default result for a new unregistered user
+        args = {
+            "refid": "",
+            "newflag": 1,
+            "binded": 0,
+            "status": CardStatus.NOT_REGISTERED,
+        }
 
         # Check if a user with this card id already exists
         user = User.from_cardid(cardid)
 
-        if user is None:
-            # The user doesn't exist, force system to create a new account
-            response = E.response(
-                E.cardmng(
-                    {
-                        "newflag": "1",
-                        "binded": "0",
-                        "status": str(CardMng.NOT_REGISTERED),
-                    }
-                )
-            )
-        else:
+        # We have a returning user
+        if user is not None:
             refid = RefID.from_userid(user.userid)
             bound = UserAccount.from_userid(user.userid) is not None
 
             if refid is None:
+                # TODO: better exception?
                 raise Exception("RefID Should not be None here!")
 
-            response = E.response(
-                E.cardmng(
-                    {
-                        "refid": refid.refid,
-                        "dataid": refid.refid,
-                        "newflag": "0",
-                        "binded": "1" if bound else "0",
-                        "expired": "0",
-                        "exflag": "0",
-                        "useridflag": "1",
-                        "extidflag": "1",
-                        "status": str(CardMng.SUCCESS),
-                    }
-                )
+            args["refid"] = refid.refid
+            args["newflag"] = 0
+            args["binded"] = bound
+            args["status"] = CardStatus.SUCCESS
+
+        result = load_xml_template("cardmng", "inquire", args)
+
+        # If we have a brand new user, we can remove unnecessary xml attributes from the
+        # cardmng node
+        if user is None:
+            drop_attributes(
+                result.find("cardmng"),
+                ["refid", "dataid", "expired", "exflag", "useridflag", "extidflag"],
             )
 
-        return response
+        return result
 
     @classmethod
     def getrefid(cls, req: ServiceRequest):
-        """"""
         # Grab the card id and pin
         cardid = get_xml_attrib(req.xml[0], "cardid")
         pin = get_xml_attrib(req.xml[0], "passwd")
@@ -117,7 +110,7 @@ class CardMng(object):
         # Generate the refid and return it
         refid = RefID.create_with_userid(user.userid)
 
-        return E.response(E.cardmng({"dataid": refid.refid, "refid": refid.refid}))
+        return load_xml_template("cardmng", "getrefid", {"refid": refid.refid})
 
     @classmethod
     def authpass(cls, req: ServiceRequest):
@@ -134,13 +127,9 @@ class CardMng(object):
 
         # Check if the pin is valid for the user
         user = refid.user
-        valid = user.pin == pin
+        status = CardStatus.SUCCESS if user.pin == pin else CardStatus.INVALID_PIN
 
-        return E.response(
-            E.cardmng(
-                {"status": str(CardMng.SUCCESS if valid else CardMng.INVALID_PIN)}
-            )
-        )
+        return load_xml_template("cardmng", "authpass", {"status": status})
 
     @classmethod
     def bindmodel(cls, req: ServiceRequest):
@@ -157,18 +146,20 @@ class CardMng(object):
         db.session.add(profile)
         db.session.commit()
 
-        return E.response(E.cardmng({"dataid": refid.refid}))
+        return load_xml_template("cardmng", "bindmodel", {"refid": refid.refid})
 
     @classmethod
     def getkeepspan(cls):
         """
         Unclear what this method does, return an arbitrary span
         """
-        return E.response(E.cardmng({"keepspan": "30"}))
+
+        keepspan = 30
+        return load_xml_template("cardmng", "getkeepspan", {"keepspan": keepspan})
 
     @classmethod
     def getdatalist(cls):
         """
         Unclear what this method does, return a dummy response
         """
-        return E.response(E.cardmng())
+        return load_xml_template("cardmng", "cardmng")

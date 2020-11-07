@@ -1,6 +1,6 @@
 from lxml.builder import E
 
-from v8_server.eamuse.utils.xml import XMLBinTypes as T, e_type
+from v8_server.eamuse.xml.utils import XMLBinTypes as T, e_type
 
 
 class Facility(object):

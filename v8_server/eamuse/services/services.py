@@ -18,7 +18,7 @@ from v8_server import LOG_PATH, app
 from v8_server.eamuse.utils.arc4 import EAmuseARC4
 from v8_server.eamuse.utils.eamuse import Model
 from v8_server.eamuse.utils.lz77 import Lz77
-from v8_server.eamuse.utils.xml import get_xml_attrib, get_xml_tag
+from v8_server.eamuse.xml.utils import get_xml_attrib, get_xml_tag
 
 
 # We want a general logger, and a special logger to log requests separately
