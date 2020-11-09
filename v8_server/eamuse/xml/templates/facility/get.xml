@@ -1,0 +1,43 @@
+<response>
+  <facility expire="600">
+    <location>
+      <id>{id}</id>
+      <country>{country}</country>
+      <region>{region}</region>
+      <name>{name}</name>
+      <type __type="u8">0</type>
+    </location>
+    <line>
+      <id>.</id>
+      <class __type="u8">0</class>
+    </line>
+    <portfw>
+      <globalip __type="ip4" __count="1">127.0.0.1</globalip>
+      <globalport __type="u16">80</globalport>
+      <privateport __type="u16">80</privateport>
+    </portfw>
+    <public>
+      <flag __type="u8">1</flag>
+      <name>{name}</name>
+      <latitude>0</latitude>
+      <longitude>0</longitude>
+    </public>
+    <share>
+      <eacoin>
+        <notchamount __type="s32">3000</notchamount>
+        <notchcount __type="s32">3</notchcount>
+        <supplylimit __type="s32">10000</supplylimit>
+      </eacoin>
+      <eapass>
+        <valid __type="u16">365</valid>
+      </eapass>
+      <url>
+        <eapass>www.ea-pass.konami.net</eapass>
+        <arcadefan>www.konami.jp/am</arcadefan>
+        <konaminetdx>http://am.573.jp</konaminetdx>
+        <konamiid>http://id.konami.net</konamiid>
+        <eagate>http://eagate.573.jp</eagate>
+      </url>
+    </share>
+  </facility>
+</response>

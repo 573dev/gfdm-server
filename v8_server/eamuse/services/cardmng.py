@@ -1,10 +1,8 @@
+from typing import Any, Dict, List, Optional
+
 from v8_server import db
 from v8_server.eamuse.services.services import ServiceRequest
-from v8_server.eamuse.xml.utils import (
-    drop_attributes,
-    get_xml_attrib,
-    load_xml_template,
-)
+from v8_server.eamuse.xml.utils import get_xml_attrib, load_xml_template
 from v8_server.model.user import Card, Profile, RefID, User, UserAccount
 from v8_server.utils.convert import bool_to_int as btoi
 
@@ -53,19 +51,25 @@ class CardMng(object):
         # Grab the card id
         cardid = get_xml_attrib(req.xml[0], "cardid")
 
-        # Default result for a new unregistered user
-        args = {
-            "refid": "",
+        # New unregistered user
+        args: Dict[str, Any] = {
             "newflag": 1,
             "binded": 0,
             "status": CardStatus.NOT_REGISTERED,
         }
-
-        # Check if a user with this card id already exists
-        user = User.from_cardid(cardid)
+        drop_attributes: Optional[Dict[str, List[str]]] = {
+            "cardmng": [
+                "refid",
+                "dataid",
+                "expired",
+                "exflag",
+                "useridflag",
+                "extidflag",
+            ]
+        }
 
         # We have a returning user
-        if user is not None:
+        if (user := User.from_cardid(cardid)) is not None:
             refid = RefID.from_userid(user.userid)
             bound = UserAccount.from_userid(user.userid) is not None
 
@@ -73,22 +77,17 @@ class CardMng(object):
                 # TODO: better exception?
                 raise Exception("RefID Should not be None here!")
 
-            args["refid"] = refid.refid
-            args["newflag"] = 0
-            args["binded"] = btoi(bound)
-            args["status"] = CardStatus.SUCCESS
+            args = {
+                "refid": refid.refid,
+                "newflag": 0,
+                "binded": btoi(bound),
+                "status": CardStatus.SUCCESS,
+            }
+            drop_attributes = None
 
-        result = load_xml_template("cardmng", "inquire", args)
-
-        # If we have a brand new user, we can remove unnecessary xml attributes from the
-        # cardmng node
-        if user is None:
-            drop_attributes(
-                result.find("cardmng"),
-                ["refid", "dataid", "expired", "exflag", "useridflag", "extidflag"],
-            )
-
-        return result
+        return load_xml_template(
+            "cardmng", "inquire", args, drop_attributes=drop_attributes
+        )
 
     @classmethod
     def getrefid(cls, req: ServiceRequest):

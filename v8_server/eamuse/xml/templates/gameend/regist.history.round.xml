@@ -1,0 +1,20 @@
+<round before="0">
+    <defeat_class __type="s8">0</defeat_class>
+    <rival_type __type="s8">0</rival_type>
+    <name __type="str">0</name>
+    <shopname __type="str">0</shopname>
+    <chara_icon __type="u8">0</chara_icon>
+    <pref __type="u8">0</pref>
+    <skill __type="s32">0</skill>
+    <battle_rate __type="s32">0</battle_rate>
+    <syogo __type="s16" __count="2">0 0</syogo>
+    <result __type="s8">0</result>
+    <seqmode __type="s8" __count="2">0 0</seqmode>
+    <score_type __type="s8" __count="2">0 0</score_type>
+    <musicid __type="s32" __count="2">0 0</musicid>
+    <flags __type="u32" __count="2">0 0</flags>
+    <score_diff __type="s32" __count="2">0 0</score_diff>
+    <item __type="s16" __count="2">0 0</item>
+    <select_type __type="s8" __count="2">0 0</select_type>
+    <gold_star_hist __type="u8">0</gold_star_hist>
+</round>

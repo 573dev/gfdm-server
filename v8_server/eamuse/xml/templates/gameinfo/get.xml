@@ -1,0 +1,62 @@
+<response>
+    <gameinfo>
+        <mode __type="u8">0</mode>
+        <free_music __type="u32">{free_music}</free_music>
+        <key>
+            <musicid __type="s32">-1</musicid>
+        </key>
+        <limit_gdp __type="u32">40000</limit_gdp>
+        <free_chara __type="u32">{free_chara}</free_chara>
+        <tag __type="u8">{tag}</tag>
+        <bossdata>
+            <division __type="u8">{division}</division>
+            <border __type="u8" __count="9">0 0 0 0 0 0 0 0 0</border>
+            <extra_border __type="u8">90</extra_border>
+            <bsc_encore_border __type="u8">92</bsc_encore_border>
+            <adv_encore_border __type="u8">93</adv_encore_border>
+            <ext_encore_border __type="u8">94</ext_encore_border>
+            <bsc_premium_border __type="u8">95</bsc_premium_border>
+            <adv_premium_border __type="u8">95</adv_premium_border>
+            <ext_premium_border __type="u8">95</ext_premium_border>
+        </bossdata>
+        <battledata>
+            <battle_music_level __type="u8" __count="13">0 0 0 0 0 0 0 0 0 0 0 0 0</battle_music_level>
+            <standard_skill __type="s32" __count="13">0 0 0 0 0 0 0 0 0 0 0 0 0</standard_skill>
+            <border_skill __type="s32" __count="13">0 0 0 0 0 0 0 0 0 0 0 0 0</border_skill>
+        </battledata>
+        <quest>
+            <division __type="u8">0</division>
+            <border __type="u8">0</border>
+            <qdata __type="u32" __count="26">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</qdata>
+            <play_0 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</play_0>
+            <play_1 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</play_1>
+            <play_2 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</play_2>
+            <play_3 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</play_3>
+            <play_4 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</play_4>
+            <play_5 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</play_5>
+            <play_6 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</play_6>
+            <play_7 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</play_7>
+            <play_8 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</play_8>
+            <play_9 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</play_9>
+            <play_10 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</play_10>
+            <play_11 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</play_11>
+            <play_12 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</play_12>
+            <clear_0 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</clear_0>
+            <clear_1 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</clear_1>
+            <clear_2 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</clear_2>
+            <clear_3 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</clear_3>
+            <clear_4 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</clear_4>
+            <clear_5 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</clear_5>
+            <clear_6 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</clear_6>
+            <clear_7 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</clear_7>
+            <clear_8 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</clear_8>
+            <clear_9 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</clear_9>
+            <clear_10 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</clear_10>
+            <clear_11 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</clear_11>
+            <clear_12 __type="u32" __count="32">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</clear_12>
+        </quest>
+        <campaign>
+            <campaign __type="u8">0</campaign>
+        </campaign>
+    </gameinfo>
+</response>

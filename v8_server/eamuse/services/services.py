@@ -119,6 +119,9 @@ class ServiceRequest(object):
     # Log dir for the requests
     LOG_DIR = LOG_PATH / "requests"
 
+    # Static Request ID
+    REQUEST_ID = 0
+
     def __init__(self, request: Request) -> None:
         # Save the request so we can refer back to it
         self._request = request
@@ -211,6 +214,9 @@ class ServiceRequest(object):
 
         rlogger.debug(f"Response:\n{xml_bytes.decode(self.ENCODING)}")
 
+        # Update the Static Request ID
+        ServiceRequest.REQUEST_ID += 1
+
         return xml_bin, headers
 
     def _get_encryption_data(self) -> Tuple[str, bytes]:
@@ -233,7 +239,10 @@ class ServiceRequest(object):
 
         # Write out the data
         date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-        filepath = self.LOG_DIR / f"eamuse_{date}_{uid}_{kind}.xml"
+        filepath = (
+            self.LOG_DIR
+            / f"eamuse_{date}_{uid}_{ServiceRequest.REQUEST_ID:04d}_{kind}.xml"
+        )
         with filepath.open("wb") as f:
             logging.debug(f"Writing File: {filepath}")
             f.write(data)

@@ -1,0 +1,4 @@
+<data>
+    <musicid __type="s32">{musicid}</musicid>
+    <last1 __type="s32">{last1}</last1>
+</data>

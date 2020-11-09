@@ -71,7 +71,7 @@ def service_service(route: int) -> FlaskResponse:
             raise Exception(f"Not sure how to handle this PCBEvent Request: {req}")
     elif route == ServiceType.PACKAGE.value:
         if req.method == Package.LIST:
-            response = Package.list(req)
+            response = Package.list()
         else:
             raise Exception(f"Not sure how to handle this Package Request: {req}")
     elif route == ServiceType.FACILITY.value:

@@ -1,7 +1,4 @@
-from lxml.builder import E
-
-from v8_server.eamuse.services.services import ServiceRequest
-from v8_server.eamuse.xml.utils import get_xml_attrib
+from v8_server.eamuse.xml.utils import load_xml_template
 
 
 class Package(object):
@@ -19,26 +16,6 @@ class Package(object):
     # Methods
     LIST = "list"
 
-    # PKGTypes
-    PKGTYPE_ALL = "all"
-
     @classmethod
-    def list(cls, req: ServiceRequest):
-        """
-        Example:
-            <response>
-                <package expire="600"/>
-            </response>
-        """
-        # Grab the pkgtype in case we ever need it
-        pkgtype = get_xml_attrib(req.xml[0], "pkgtype")
-
-        if pkgtype == cls.PKGTYPE_ALL:
-            response = E.response(E.package({"expire": "600"}))
-        else:
-            raise Exception(
-                "Not sure how to handle this package request. "
-                f'pkgtype "{pkgtype}" is unknown for request: {req}'
-            )
-
-        return response
+    def list(cls):
+        return load_xml_template("package", "list")

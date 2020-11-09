@@ -1,0 +1,7 @@
+<round before="0">
+    <point __type="s16">0</point>
+    <my_select_musicid __type="s32">0</my_select_musicid>
+    <my_select_result __type="s8">0</my_select_result>
+    <rival_select_musicid __type="s32">0</rival_select_musicid>
+    <rival_select_result __type="s8">0</rival_select_result>
+</round>

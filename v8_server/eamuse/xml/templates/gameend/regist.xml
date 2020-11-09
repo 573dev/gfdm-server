@@ -1,0 +1,85 @@
+<response>
+    <gameend>
+        <gamemode mode="{gamemode}"/>
+        <player card="{player_card}" no="{player_no}">
+            <skill>
+                <point __type="s32">0</point>
+                <rank __type="u32">1</rank>
+                <total_nr __type="u32">1</total_nr>
+                <all_point __type="s32">0</all_point>
+                <all_rank __type="u32">1</all_rank>
+                <all_total_nr __type="u32">1</all_total_nr>
+            </skill>
+            <registered_other_num __type="u32">0</registered_other_num>
+            <xg_play_cnt __type="u32">0</xg_play_cnt>
+            <play_cnt __type="u32">0</play_cnt>
+            <sess_cnt __type="u32">0</sess_cnt>
+            <encore_play __type="u32">0</encore_play>
+            <premium_play __type="u32">0</premium_play>
+            <now_time>{now_time}</now_time>
+            <kikan_event __type="u32">0</kikan_event>
+            <vip_rensyo __type="u16">0</vip_rensyo>
+            <all_play_mode __type="u8">0</all_play_mode>
+            <play_shop_num __type="u8">0</play_shop_num>
+            <judge_perfect __type="u32">0</judge_perfect>
+            <is_v5_goodplayer __type="u8">0</is_v5_goodplayer>
+            <max_clear_difficulty __type="s8">0</max_clear_difficulty>
+            <max_fullcombo_difficulty __type="s8">0</max_fullcombo_difficulty>
+            <max_excellent_difficulty __type="s8">0</max_excellent_difficulty>
+            <rival_data/>
+            <battledata>
+                <bp __type="u32">0</bp>
+                <battle_rate __type="s32">0</battle_rate>
+                <battle_class __type="u8">0</battle_class>
+                <point __type="s16">0</point>
+                <rensyo __type="u16">0</rensyo>
+                <win __type="u32">0</win>
+                <lose __type="u32">0</lose>
+                <score_type __type="u8">0</score_type>
+                <strategy_item __type="s16">0</strategy_item>
+                <production_item __type="s16">0</production_item>
+                <draw __type="u32">0</draw>
+                <max_class __type="u8">0</max_class>
+                <max_rensyo __type="u16">0</max_rensyo>
+                <vip_rensyo __type="u16">0</vip_rensyo>
+                <max_defeat_skill __type="s32">0</max_defeat_skill>
+                <max_defeat_battle_rate __type="s32">0</max_defeat_battle_rate>
+                <gold_star __type="u32">0</gold_star>
+                <random_select __type="u32">0</random_select>
+                <type_normal __type="u32">0</type_normal>
+                <type_perfect __type="u32">0</type_perfect>
+                <type_combo __type="u32">0</type_combo>
+                <battle_aniv>
+                    <get>
+                        <category_ver __type="u16" __count="11">0 0 0 0 0 0 0 0 0 0 0</category_ver>
+                        <category_genre __type="u16" __count="11">0 0 0 0 0 0 0 0 0 0 0</category_genre>
+                    </get>
+                </battle_aniv>
+                <area_id_list __type="u8" __count="60">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</area_id_list>
+                <area_win_list __type="u32" __count="60">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</area_win_list>
+                <area_lose_list __type="u32" __count="60">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</area_lose_list>
+                <area_draw_list __type="u32" __count="60">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</area_draw_list>
+                <perfect __type="u32">0</perfect>
+                <great __type="u32">0</great>
+                <good __type="u32">0</good>
+                <poor __type="u32">0</poor>
+                <miss __type="u32">0</miss>
+                <history>
+                    {history_rounds}
+                </history>
+                <music_hist>
+                    {music_hist_rounds}
+                </music_hist>
+            </battledata>
+            <quest>
+                <quest_rank __type="u8">0</quest_rank>
+                <star __type="u32">0</star>
+                <fan __type="u64">0</fan>
+                <qdata __type="u32" __count="39">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</qdata>
+            </quest>
+            <championship>
+                <playable __type="s32" __count="4">0 0 0 0</playable>
+            </championship>
+        </player>
+    </gameend>
+</response>

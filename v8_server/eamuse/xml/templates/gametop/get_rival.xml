@@ -1,0 +1,31 @@
+<response>
+    <gametop>
+        <player no="1">
+            <pdata rival_id="0">
+                <name __type="str">{name}</name>
+                <chara __type="u8">{chara}</chara>
+                <skill __type="s32">0</skill>
+                <syogo __type="s16" __count="2">0 0</syogo>
+                <info_level __type="u8">0</info_level>
+                <bdata>
+                    <battle_rate __type="s32">0</battle_rate>
+                    <battle_class __type="u8">0</battle_class>
+                    <point __type="s16">0</point>
+                    <rensyo __type="u16">0</rensyo>
+                    <win __type="u32">0</win>
+                    <lose __type="u32">0</lose>
+                    <draw __type="u32">0</draw>
+                </bdata>
+                <quest>
+                    <quest_rank __type="u8">0</quest_rank>
+                    <star __type="u32">0</star>
+                    <fan __type="u64">0</fan>
+                    <qdata __type="u32" __count="13">0 0 0 0 0 0 0 0 0 0 0 0 0</qdata>
+                    <test_data __type="u32" __count="12">0 0 0 0 0 0 0 0 0 0 0 0</test_data>
+                </quest>
+            </pdata>
+            <standard nr="0"/>
+            <finish __type="u8">1</finish>
+        </player>
+    </gametop>
+</response>

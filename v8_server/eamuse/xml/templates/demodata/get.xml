@@ -1,0 +1,25 @@
+<response>
+    <demodata>
+        <mode __type="u8">0</mode>
+        <hitchart nr="{hitchart_nr}">
+            <start __type="str">{start}</start>
+            <end __type="str">{end}</end>
+            {hitchart_data}
+        </hitchart>
+        <bossdata>
+            <division __type="u8">{division}</division>
+            <border __type="u8" __count="9">0 0 0 0 0 0 0 0 0</border>
+            <extra_border __type="u8">90</extra_border>
+            <bsc_encore_border __type="u8">92</bsc_encore_border>
+            <adv_encore_border __type="u8">93</adv_encore_border>
+            <ext_encore_border __type="u8">94</ext_encore_border>
+            <bsc_premium_border __type="u8">95</bsc_premium_border>
+            <adv_premium_border __type="u8">95</adv_premium_border>
+            <ext_premium_border __type="u8">95</ext_premium_border>
+        </bossdata>
+        <info>
+            <message __type="str">{message}</message>
+        </info>
+        <assert_report_state __type="u8">0</assert_report_state>
+    </demodata>
+</response>

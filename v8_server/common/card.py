@@ -826,13 +826,13 @@ class CardCipher:
         out = [0] * 8
 
         CardCipher.__from_int(
-            out, CardCipher.__operatorA(0x00, CardCipher.__to_int(inp))
+            out, CardCipher.__operator_a(0x00, CardCipher.__to_int(inp))
         )
         CardCipher.__from_int(
-            out, CardCipher.__operatorB(0x20, CardCipher.__to_int(out))
+            out, CardCipher.__operator_b(0x20, CardCipher.__to_int(out))
         )
         CardCipher.__from_int(
-            out, CardCipher.__operatorA(0x40, CardCipher.__to_int(out))
+            out, CardCipher.__operator_a(0x40, CardCipher.__to_int(out))
         )
 
         return bytes(out)
@@ -848,35 +848,35 @@ class CardCipher:
         out = [0] * 8
 
         CardCipher.__from_int(
-            out, CardCipher.__operatorB(0x40, CardCipher.__to_int(inp))
+            out, CardCipher.__operator_b(0x40, CardCipher.__to_int(inp))
         )
         CardCipher.__from_int(
-            out, CardCipher.__operatorA(0x20, CardCipher.__to_int(out))
+            out, CardCipher.__operator_a(0x20, CardCipher.__to_int(out))
         )
         CardCipher.__from_int(
-            out, CardCipher.__operatorB(0x00, CardCipher.__to_int(out))
+            out, CardCipher.__operator_b(0x00, CardCipher.__to_int(out))
         )
 
         return bytes(out)
 
     @staticmethod
     def __to_int(data: List[int]) -> int:
-        inX = (
+        in_x = (
             (data[0] & 0xFF)
             | ((data[1] & 0xFF) << 8)
             | ((data[2] & 0xFF) << 16)
             | ((data[3] & 0xFF) << 24)
         )
 
-        inY = (
+        in_y = (
             (data[4] & 0xFF)
             | ((data[5] & 0xFF) << 8)
             | ((data[6] & 0xFF) << 16)
             | ((data[7] & 0xFF) << 24)
         )
 
-        v7 = ((((inX ^ (inY >> 4)) & 0xF0F0F0F) << 4) ^ inY) & 0xFFFFFFFF
-        v8 = (((inX ^ (inY >> 4)) & 0xF0F0F0F) ^ inX) & 0xFFFFFFFF
+        v7 = ((((in_x ^ (in_y >> 4)) & 0xF0F0F0F) << 4) ^ in_y) & 0xFFFFFFFF
+        v8 = (((in_x ^ (in_y >> 4)) & 0xF0F0F0F) ^ in_x) & 0xFFFFFFFF
 
         v9 = ((v7 ^ (v8 >> 16))) & 0x0000FFFF
         v10 = (((v7 ^ (v8 >> 16)) << 16) ^ v8) & 0xFFFFFFFF
@@ -921,20 +921,20 @@ class CardCipher:
         v34 = (v32 ^ v30) & 0xFFFFFFFF
         v35 = (v33 ^ (v34 >> 4)) & 0xF0F0F0F
 
-        outY = ((v35 << 4) ^ v34) & 0xFFFFFFFF
-        outX = (v35 ^ v33) & 0xFFFFFFFF
+        out_y = ((v35 << 4) ^ v34) & 0xFFFFFFFF
+        out_x = (v35 ^ v33) & 0xFFFFFFFF
 
-        data[0] = outX & 0xFF
-        data[1] = (outX >> 8) & 0xFF
-        data[2] = (outX >> 16) & 0xFF
-        data[3] = (outX >> 24) & 0xFF
-        data[4] = outY & 0xFF
-        data[5] = (outY >> 8) & 0xFF
-        data[6] = (outY >> 16) & 0xFF
-        data[7] = (outY >> 24) & 0xFF
+        data[0] = out_x & 0xFF
+        data[1] = (out_x >> 8) & 0xFF
+        data[2] = (out_x >> 16) & 0xFF
+        data[3] = (out_x >> 24) & 0xFF
+        data[4] = out_y & 0xFF
+        data[5] = (out_y >> 8) & 0xFF
+        data[6] = (out_y >> 16) & 0xFF
+        data[7] = (out_y >> 24) & 0xFF
 
     @staticmethod
-    def __operatorA(off: int, state: int) -> int:
+    def __operator_a(off: int, state: int) -> int:
         v3 = (state >> 32) & 0xFFFFFFFF
         v4 = state & 0xFFFFFFFF
 
@@ -968,7 +968,7 @@ class CardCipher:
         return ((v3 & 0xFFFFFFFF) << 32) | (v4 & 0xFFFFFFFF)
 
     @staticmethod
-    def __operatorB(off: int, state: int) -> int:
+    def __operator_b(off: int, state: int) -> int:
         v3 = (state >> 32) & 0xFFFFFFFF
         v4 = state & 0xFFFFFFFF
 

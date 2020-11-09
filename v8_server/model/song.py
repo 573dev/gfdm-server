@@ -4,7 +4,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import List, Tuple
+from typing import List
 
 from flask_sqlalchemy.model import DefaultMeta
 from sqlalchemy import Column, ForeignKey, PrimaryKeyConstraint, event, func, text

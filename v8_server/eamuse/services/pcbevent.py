@@ -2,9 +2,9 @@ import logging
 from datetime import datetime
 
 from lxml import etree
-from lxml.builder import E
 
 from v8_server.eamuse.services.services import ServiceRequest
+from v8_server.eamuse.xml.utils import load_xml_template
 
 
 logger = logging.getLogger(__name__)
@@ -95,7 +95,7 @@ class PCBEvent(object):
         event = PCBEvent(req)
         logger.info(event)
 
-        return E.response(E.pcbevent({"expire": "600"}))
+        return load_xml_template("pcbevent", "put")
 
     def __repr__(self) -> str:
         return (

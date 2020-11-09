@@ -1,0 +1,9 @@
+<response>
+    <shopinfo>
+        <data>
+            <cabid __type="u32">1</cabid>
+            <locationid __type="str">nowhere</locationid>
+            <is_send __type="u8">1</is_send>
+        </data>
+    </shopinfo>
+</response>

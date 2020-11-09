@@ -1,4 +1,4 @@
-from lxml.builder import E
+from v8_server.eamuse.xml.utils import load_xml_template
 
 
 class Message(object):
@@ -18,10 +18,4 @@ class Message(object):
 
     @classmethod
     def get(cls):
-        """
-        Example:
-            <response>
-                <message expire="600"/>
-            </response>
-        """
-        return E.response(E.message({"expire": "600"}))
+        return load_xml_template("message", "get")
