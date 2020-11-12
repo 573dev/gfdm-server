@@ -7,6 +7,7 @@ from v8_server import db
 from v8_server.eamuse.services.services import ServiceRequest
 from v8_server.eamuse.xml.utils import get_xml_attrib, load_xml_template
 from v8_server.model.song import HitChart
+from v8_server.model.user import User, UserData
 from v8_server.utils.convert import int_to_bool as itob
 
 
@@ -447,6 +448,27 @@ class Regist(object):
             logger.debug(f"Saving HitChart: {hc}")
             db.session.add(hc)
         db.session.commit()
+
+        # Save player data
+        playerinfo = self.player.playerinfo
+        user = User.from_refid(playerinfo.refid)
+        if user is not None:
+            user_data = UserData.from_userid(user.userid)
+
+            if user_data is None:
+                user_data = UserData(
+                    userid=user.userid,
+                    style=playerinfo.styles,
+                    style_2=playerinfo.styles_2,
+                )
+                db.session.add(user_data)
+            else:
+                user_data.style = playerinfo.styles
+                user_data.style_2 = playerinfo.styles_2
+
+            db.session.commit()
+        else:
+            raise Exception("This user doesn't exist")
 
         # Just send back a dummy object for now
         now_time = datetime.now().strftime(self.DT_FMT)

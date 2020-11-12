@@ -11,7 +11,7 @@
             <favorite_music_3 __type="s16" __count="20">-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1</favorite_music_3>
             <secret_music __type="u16" __count="32">{secret_music}</secret_music>
             <style __type="u32">{style}</style>
-            <style_2 __type="u32">0</style_2>
+            <style_2 __type="u32">{style_2}</style_2>
             <shutter_list __type="u32">0</shutter_list>
             <judge_logo_list __type="u32">0</judge_logo_list>
             <skin_list __type="u32">0</skin_list>

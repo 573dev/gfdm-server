@@ -20,7 +20,7 @@ class Progress(object):
     def __init__(self, req: ServiceRequest) -> None:
         self.progress_value = int(req.xml[0].find("progress").text)
 
-    def progress(self) -> etree:
+    def response(self) -> etree:
         return load_xml_template("dlstatus", "progress")
 
     def __repr__(self) -> str:

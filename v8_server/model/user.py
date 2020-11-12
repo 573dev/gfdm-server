@@ -59,9 +59,32 @@ class UserAccount(BaseModel):
     is_succession = Column(Boolean, nullable=False)
     user = relationship("User", back_populates="user_account")
 
+    def __repr__(self) -> str:
+        return (
+            f'UserAccount<userid = {self.userid}, name = "{self.name}", '
+            f"chara = {self.chara}, is_succession = {self.is_succession}>"
+        )
+
     @classmethod
     def from_userid(cls, userid: int) -> Optional[UserAccount]:
         q = db.session.query(UserAccount).filter(UserAccount.userid == userid)
+        return q.one_or_none()
+
+
+class UserData(BaseModel):
+    """
+    Table representing user data such as mods, etc
+    """
+
+    __tablename__ = "user_data"
+
+    userid = Column(Integer, ForeignKey("users.userid"), primary_key=True)
+    style = Column(Integer, nullable=False)
+    style_2 = Column(Integer, nullable=False)
+
+    @classmethod
+    def from_userid(cls, userid: int) -> Optional[UserData]:
+        q = db.session.query(UserData).filter(UserData.userid == userid)
         return q.one_or_none()
 
 

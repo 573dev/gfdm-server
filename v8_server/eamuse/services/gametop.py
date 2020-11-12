@@ -5,6 +5,7 @@ from lxml import etree
 from v8_server.eamuse.services.services import ServiceRequest
 from v8_server.eamuse.utils.crc import calculate_crc8
 from v8_server.eamuse.xml.utils import fill, get_xml_attrib, load_xml_template
+from v8_server.model.user import User, UserData
 
 
 logger = logging.getLogger(__name__)
@@ -74,6 +75,17 @@ class Get(object):
         return f"Gametop.Get<player = {self.player}>"
 
     def response(self) -> etree:
+        # Grab user_data
+        user = User.from_refid(self.player.refid)
+        style = 2097152
+        style_2 = 0
+        if user is not None:
+            user_data = UserData.from_userid(user.userid)
+
+            if user_data is not None:
+                style = user_data.style
+                style_2 = user_data.style_2
+
         # Generate history rounds (blank for now)
         history_rounds = ""
         for _ in range(0, 10):
@@ -95,7 +107,8 @@ class Get(object):
 
         args = {
             "secret_music": secret_music,
-            "style": 2097152,
+            "style": style,
+            "style_2": style_2,
             "secret_chara": secret_chara,
             "tag": tag,
             "history_rounds": history_rounds,

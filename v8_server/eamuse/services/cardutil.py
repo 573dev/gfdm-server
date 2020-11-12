@@ -104,7 +104,7 @@ class Data(object):
         self.chara = int(root.find("chara").text)
         self.uid = root.find("uid").text
         self.cabid = int(root.find("cabid").text)
-        self.is_succession = itob(int(root.find("is_succession")))
+        self.is_succession = itob(int(root.find("is_succession").text))
 
     def __repr__(self) -> str:
         return (
