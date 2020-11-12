@@ -1,21 +1,10 @@
+import importlib
 from typing import Dict, Tuple
 
 from flask import request
 
 from v8_server import app
-from v8_server.eamuse.services import (
-    CardMng,
-    DLStatus,
-    Facility,
-    Local,
-    Message,
-    Package,
-    PCBEvent,
-    PCBTracker,
-    ServiceRequest,
-    Services,
-    ServiceType,
-)
+from v8_server.eamuse.services import ServiceRequest, Services
 
 
 FlaskResponse = Tuple[bytes, Dict[str, str]]
@@ -54,70 +43,27 @@ def service_service(route: int) -> FlaskResponse:
     # simple as possible
     req = ServiceRequest(request)
 
-    if route == ServiceType.PCBTRACKER.value:
-        if req.method == PCBTracker.ALIVE:
-            response = PCBTracker.alive()
-        else:
-            raise Exception(f"Not sure how to handle this PCBTracker Request: {req}")
-    elif route == ServiceType.MESSAGE.value:
-        if req.method == Message.GET:
-            response = Message.get()
-        else:
-            raise Exception(f"Not sure how to handle this Message Request: {req}")
-    elif route == ServiceType.PCBEVENT.value:
-        if req.method == PCBEvent.PUT:
-            response = PCBEvent.put(req)
-        else:
-            raise Exception(f"Not sure how to handle this PCBEvent Request: {req}")
-    elif route == ServiceType.PACKAGE.value:
-        if req.method == Package.LIST:
-            response = Package.list()
-        else:
-            raise Exception(f"Not sure how to handle this Package Request: {req}")
-    elif route == ServiceType.FACILITY.value:
-        if req.method == Facility.GET:
-            response = Facility.get()
-        else:
-            raise Exception(f"Not sure how to handle this Facility Request: {req}")
-    elif route == ServiceType.DLSTATUS.value:
-        if req.method == DLStatus.PROGRESS:
-            response = DLStatus.progress()
-        else:
-            raise Exception(f"Not sure how to handle this DLStatus Request: {req}")
-    elif route == ServiceType.CARDMNG.value:
-        if req.method == CardMng.INQUIRE:
-            response = CardMng.inquire(req)
-        elif req.method == CardMng.GETREFID:
-            response = CardMng.getrefid(req)
-        elif req.method == CardMng.AUTHPASS:
-            response = CardMng.authpass(req)
-        elif req.method == CardMng.BINDMODEL:
-            response = CardMng.bindmodel(req)
-        elif req.method == CardMng.GETKEEPSPAN:
-            response = CardMng.getkeepspan()
-        elif req.method == CardMng.GETDATALIST:
-            response = CardMng.getdatalist()
-        else:
-            raise Exception(f"Not sure how to handle this Cardmng Request: {req}")
-    elif route == ServiceType.LOCAL.value:
-        if req.module == Local.SHOPINFO:
-            response = Local.shopinfo(req)
-        elif req.module == Local.DEMODATA:
-            response = Local.demodata(req)
-        elif req.module == Local.CARDUTIL:
-            response = Local.cardutil(req)
-        elif req.module == Local.GAMEINFO:
-            response = Local.gameinfo(req)
-        elif req.module == Local.GAMEEND:
-            response = Local.gameend(req)
-        elif req.module == Local.GAMETOP:
-            response = Local.gametop(req)
-        elif req.module == Local.CUSTOMIZE:
-            response = Local.customize(req)
-        else:
-            raise Exception(f"Not sure how to handle this Local Request: {req}")
+    if req.method is not None:
+        method = req.method.title().replace("_", "")
+        try:
+            module = importlib.import_module(f"v8_server.eamuse.services.{req.module}")
+        except ModuleNotFoundError:
+            app.logger.error(f"No Module found for request: {req}")
+            raise
+
+        try:
+            cls = getattr(module, method)
+        except AttributeError:
+            app.logger.error(f"No Class found for request: {req}")
+            raise
+
+        inst = cls(req)
+        app.logger.debug(inst)
+        response = inst.response()
     else:
+        print(route)
         raise Exception(f"Not sure how to handle this Request: {req}")
+
     return req.response(response)
 
 

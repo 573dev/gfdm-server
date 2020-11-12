@@ -1,25 +1,25 @@
-from v8_server.eamuse.xml.utils import load_xml_template
+from lxml import etree
+
+from v8_server.eamuse.services.services import ServiceRequest
+from v8_server.eamuse.xml.utils import get_xml_attrib, load_xml_template
 
 
-class Facility(object):
+class Get(object):
     """
-    Handle the Facility request.
+    Handle the Facility Get request.
 
-    The only method of note is the "get" method. This method expects to return a bunch
-    of information about the arcade this cabinet is in, as well as some settings for
-    URLs and the name of the cab.
+    This method expects to return a bunch of information about the arcade this cabinet
+    is in, as well as some settings for URLs and the name of the Arcade.
 
-    Example:
-        <call model="K32:J:B:A:2011033000" srcid="00010203040506070809">
-            <facility encoding="SHIFT_JIS" method="get"/>
-        </call>
+    <call model="K32:J:B:A:2011033000" srcid="00010203040506070809">
+        <facility encoding="SHIFT_JIS" method="get"/>
+    </call>
     """
 
-    # Methods
-    GET = "get"
+    def __init__(self, req: ServiceRequest) -> None:
+        self.encoding = get_xml_attrib(req.xml[0], "encoding")
 
-    @classmethod
-    def get(cls):
+    def response(self) -> etree:
         # TODO: The facility data should be read in from a config file instead of being
         # hard coded here
 
@@ -30,3 +30,6 @@ class Facility(object):
             "name": "SenPi Arcade",
         }
         return load_xml_template("facility", "get", args)
+
+    def __repr__(self) -> str:
+        return f'Facility.Get<encoding = "{self.encoding}">'

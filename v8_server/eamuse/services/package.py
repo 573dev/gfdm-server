@@ -1,21 +1,26 @@
-from v8_server.eamuse.xml.utils import load_xml_template
+from lxml import etree
+
+from v8_server.eamuse.services.services import ServiceRequest
+from v8_server.eamuse.xml.utils import get_xml_attrib, load_xml_template
 
 
-class Package(object):
+class List(object):
     """
-    Handle the Package request.
+    Handle the Package List request.
 
-    This is for supporting downloading of updates. We do not support this.
+    This is for supporting downloading of updates.
+    We do not support this.
 
-    Example:
-        <call model="K32:J:B:A:2011033000" srcid="00010203040506070809">
-            <package method="list" pkgtype="all"/>
-        </call>
+    <call model="K32:J:B:A:2011033000" srcid="00010203040506070809">
+        <package method="list" pkgtype="all"/>
+    </call>
     """
 
-    # Methods
-    LIST = "list"
+    def __init__(self, req: ServiceRequest) -> None:
+        self.pkgtype = get_xml_attrib(req.xml[0], "pkgtype")
 
-    @classmethod
-    def list(cls):
+    def response(self) -> etree:
         return load_xml_template("package", "list")
+
+    def __repr__(self) -> str:
+        return f'Package.List<pkgtype="{self.pkgtype}">'

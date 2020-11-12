@@ -1,28 +1,36 @@
-from v8_server.eamuse.xml.utils import load_xml_template
+from lxml import etree
+
+from v8_server.eamuse.services.services import ServiceRequest
+from v8_server.eamuse.xml.utils import get_xml_attrib, load_xml_template
 from v8_server.utils.convert import bool_to_int as btoi
 
 
-class PCBTracker(object):
+class Alive(object):
     """
-    Handle the PCBTracker request.
+    Handle the PCBTracker Alive request.
 
-    The only method of note is the "alive" method which returns whether PASELI should be
-    active or not for this session.
+    This method which returns whether PASELI should be active or not for this session.
 
-    Example:
-        <call model="K32:J:B:A:2011033000" srcid="00010203040506070809">
-            <pcbtracker hardid="010074D435AAD895" method="alive" softid=""/>
-        </call>
+    <call model="K32:J:B:A:2011033000" srcid="00010203040506070809">
+        <pcbtracker hardid="010074D435AAD895" method="alive" softid=""/>
+    </call>
     """
 
-    # We don't support PASELI on GFDM: V8
-    PASELI_ACTIVE = False
+    def __init__(self, req: ServiceRequest) -> None:
+        self.hardid = get_xml_attrib(req.xml[0], "hardid")
+        self.softid = get_xml_attrib(req.xml[0], "softid")
 
-    # Methods
-    ALIVE = "alive"
+        # Most likely you'd determine this value from the hardware id?
+        # Right now we don't support paseli
+        self.paseli_active = False
 
-    @classmethod
-    def alive(cls):
+    def response(self) -> etree:
         return load_xml_template(
-            "pcbtracker", "alive", {"ecenable": btoi(cls.PASELI_ACTIVE)}
+            "pcbtracker", "alive", {"ecenable": btoi(self.paseli_active)}
+        )
+
+    def __repr__(self) -> str:
+        return (
+            f'PCBTracker.Alive<hardid="{self.hardid}", softid="{self.softid}", '
+            f"paseli_active = {self.paseli_active}>"
         )
