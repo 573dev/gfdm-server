@@ -9,6 +9,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.types import Boolean, Integer, String
 
 from v8_server import db
+from v8_server.model.types import IntArray
 
 
 BaseModel: DefaultMeta = db.Model
@@ -31,6 +32,8 @@ class User(BaseModel):
     extids = relationship("ExtID", back_populates="user")
     refids = relationship("RefID", back_populates="user")
     user_account = relationship("UserAccount", uselist=False, back_populates="user")
+    user_data = relationship("UserData", uselist=False, back_populates="user")
+    play_data = relationship("PlayData", back_populates="user")
 
     def __repr__(self) -> str:
         return f'User<userid: {self.userid}, pin: "{self.pin}">'
@@ -81,11 +84,49 @@ class UserData(BaseModel):
     userid = Column(Integer, ForeignKey("users.userid"), primary_key=True)
     style = Column(Integer, nullable=False)
     style_2 = Column(Integer, nullable=False)
+    secret_music = Column(IntArray, nullable=False)
+    secret_chara = Column(Integer, nullable=False)
+    syogo = Column(IntArray, nullable=False)
+    perfect = Column(Integer, nullable=False)
+    great = Column(Integer, nullable=False)
+    good = Column(Integer, nullable=False)
+    poor = Column(Integer, nullable=False)
+    miss = Column(Integer, nullable=False)
+    time = Column(Integer, nullable=False)
+    user = relationship("User", back_populates="user_data")
 
     @classmethod
     def from_userid(cls, userid: int) -> Optional[UserData]:
         q = db.session.query(UserData).filter(UserData.userid == userid)
         return q.one_or_none()
+
+
+class PlayData(BaseModel):
+    """
+    Store play data, every stage that a user has played
+    """
+
+    __tablename__ = "play_data"
+
+    playid = Column(Integer, primary_key=True)
+    userid = Column(Integer, ForeignKey("users.userid"), nullable=False)
+    no = Column(Integer, nullable=False)
+    musicid = Column(Integer, nullable=False)
+    seqmode = Column(Integer, nullable=False)
+    clear = Column(Boolean, nullable=False)
+    auto_clear = Column(Boolean, nullable=False)
+    score = Column(Integer, nullable=False)
+    flags = Column(Integer, nullable=False)
+    fullcombo = Column(Boolean, nullable=False)
+    excellent = Column(Boolean, nullable=False)
+    combo = Column(Integer, nullable=False)
+    skill_point = Column(Integer, nullable=False)
+    skill_perc = Column(Integer, nullable=False)
+    result_rank = Column(Integer, nullable=False)
+    difficulty = Column(Integer, nullable=False)
+    combo_rate = Column(Integer, nullable=False)
+    perfect_rate = Column(Integer, nullable=False)
+    user = relationship("User", back_populates="play_data")
 
 
 class Card(BaseModel):

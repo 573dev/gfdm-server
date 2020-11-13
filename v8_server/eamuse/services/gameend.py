@@ -7,7 +7,7 @@ from v8_server import db
 from v8_server.eamuse.services.services import ServiceRequest
 from v8_server.eamuse.xml.utils import get_xml_attrib, load_xml_template
 from v8_server.model.song import HitChart
-from v8_server.model.user import User, UserData
+from v8_server.model.user import PlayData, User, UserData
 from v8_server.utils.convert import int_to_bool as itob
 
 
@@ -247,12 +247,12 @@ class Playdata(object):
     def __init__(self, root: etree) -> None:
         self.no = int(root.find("no").text)
         self.seqmode = int(root.find("seqmode").text)
-        self.clear = int(root.find("clear").text)
-        self.auto_clear = int(root.find("auto_clear").text)
+        self.clear = itob(int(root.find("clear").text))
+        self.auto_clear = itob(int(root.find("auto_clear").text))
         self.score = int(root.find("score").text)
         self.flags = int(root.find("flags").text)
-        self.fullcombo = int(root.find("fullcombo").text)
-        self.excellent = int(root.find("excellent").text)
+        self.fullcombo = itob(int(root.find("fullcombo").text))
+        self.excellent = itob(int(root.find("excellent").text))
         self.combo = int(root.find("combo").text)
         self.skill_point = int(root.find("skill_point").text)
         self.skill_perc = int(root.find("skill_perc").text)
@@ -456,19 +456,46 @@ class Regist(object):
             user_data = UserData.from_userid(user.userid)
 
             if user_data is None:
-                user_data = UserData(
-                    userid=user.userid,
-                    style=playerinfo.styles,
-                    style_2=playerinfo.styles_2,
-                )
-                db.session.add(user_data)
-            else:
-                user_data.style = playerinfo.styles
-                user_data.style_2 = playerinfo.styles_2
+                raise Exception("user data shouldn't be none here")
 
+            user_data.style = playerinfo.styles
+            user_data.style_2 = playerinfo.styles_2
+            user_data.secret_music = playerinfo.secret_music
+            user_data.secret_chara = playerinfo.secret_chara
+            user_data.perfect = playerinfo.perfect
+            user_data.great = playerinfo.great
+            user_data.good = playerinfo.good
+            user_data.poor = playerinfo.poor
+            user_data.miss = playerinfo.miss
+            user_data.time = playerinfo.time
             db.session.commit()
         else:
             raise Exception("This user doesn't exist")
+
+        # Save playdata
+        for idx, data in enumerate(self.player.playdata):
+            musicid = self.modedata.stages[idx].musicid
+            play_data = PlayData(
+                userid=user.userid,
+                no=data.no,
+                musicid=musicid,
+                seqmode=data.seqmode,
+                clear=data.clear,
+                auto_clear=data.auto_clear,
+                score=data.score,
+                flags=data.flags,
+                fullcombo=data.fullcombo,
+                excellent=data.excellent,
+                combo=data.combo,
+                skill_point=data.skill_point,
+                skill_perc=data.skill_perc,
+                result_rank=data.result_rank,
+                difficulty=data.difficulty,
+                combo_rate=data.combo_rate,
+                perfect_rate=data.perfect_rate,
+            )
+            db.session.add(play_data)
+        db.session.commit()
 
         # Just send back a dummy object for now
         now_time = datetime.now().strftime(self.DT_FMT)

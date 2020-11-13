@@ -6,7 +6,7 @@ from lxml import etree
 from v8_server import db
 from v8_server.eamuse.services.services import ServiceRequest
 from v8_server.eamuse.xml.utils import get_xml_attrib, load_xml_template
-from v8_server.model.user import User, UserAccount
+from v8_server.model.user import User, UserAccount, UserData
 from v8_server.utils.convert import int_to_bool as itob
 
 
@@ -81,10 +81,16 @@ class Check(object):
         }
 
         # Existing User
-        if not new_user and account is not None:
+        if not new_user and account is not None and user is not None:
+            user_data = user.user_data
+            # TODO: Add GDP, skill, all_skill here
             args = {
                 "state": CheckStatus.EXISTING_USER,
                 "name": account.name,
+                "gdp": 0,
+                "skill": 0,
+                "all_skill": 0,
+                "syogo": " ".join(map(str, user_data.syogo)),
                 "chara": account.chara,
             }
             drop_children = None
@@ -156,6 +162,22 @@ class Regist(object):
             is_succession=self.data.is_succession,
         )
         db.session.add(user_account)
+
+        user_data = UserData(
+            userid=user.userid,
+            style=2097152,
+            style_2=0,
+            secret_music=[0 for _ in range(0, 32)],
+            secret_chara=0,
+            syogo=[0, 0],
+            perfect=0,
+            great=0,
+            good=0,
+            poor=0,
+            miss=0,
+            time=0,
+        )
+        db.session.add(user_data)
         db.session.commit()
 
         return load_xml_template("cardutil", "regist")

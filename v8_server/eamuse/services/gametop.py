@@ -4,8 +4,8 @@ from lxml import etree
 
 from v8_server.eamuse.services.services import ServiceRequest
 from v8_server.eamuse.utils.crc import calculate_crc8
-from v8_server.eamuse.xml.utils import fill, get_xml_attrib, load_xml_template
-from v8_server.model.user import User, UserData
+from v8_server.eamuse.xml.utils import get_xml_attrib, load_xml_template
+from v8_server.model.user import User
 
 
 logger = logging.getLogger(__name__)
@@ -77,14 +77,10 @@ class Get(object):
     def response(self) -> etree:
         # Grab user_data
         user = User.from_refid(self.player.refid)
-        style = 2097152
-        style_2 = 0
-        if user is not None:
-            user_data = UserData.from_userid(user.userid)
+        if user is None:
+            raise Exception("User should not be none here")
 
-            if user_data is not None:
-                style = user_data.style
-                style_2 = user_data.style_2
+        user_data = user.user_data
 
         # Generate history rounds (blank for now)
         history_rounds = ""
@@ -99,16 +95,14 @@ class Get(object):
                 load_xml_template("gametop", "get.music_hist.round")
             ).decode("UTF-8")
 
-        secret_music = fill(32)
-        secret_chara = 0
-        tag = calculate_crc8(
-            str(sum(int(x) for x in secret_music.split()) + secret_chara)
-        )
+        secret_music = user_data.secret_music
+        secret_chara = user_data.secret_chara
+        tag = calculate_crc8(str(sum(secret_music) + secret_chara))
 
         args = {
-            "secret_music": secret_music,
-            "style": style,
-            "style_2": style_2,
+            "secret_music": " ".join(map(str, secret_music)),
+            "style": user_data.style,
+            "style_2": user_data.style_2,
             "secret_chara": secret_chara,
             "tag": tag,
             "history_rounds": history_rounds,

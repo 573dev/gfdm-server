@@ -2,8 +2,10 @@ import logging
 
 from lxml import etree
 
+from v8_server import db
 from v8_server.eamuse.services.services import ServiceRequest
 from v8_server.eamuse.xml.utils import get_xml_attrib, load_xml_template
+from v8_server.model.user import User
 
 
 logger = logging.getLogger(__name__)
@@ -79,4 +81,13 @@ class Regist(object):
         return f"Customize.Regist<players = {self.players}>"
 
     def response(self) -> etree:
+        # Save the syogo data (assume single player right now)
+        user = User.from_refid(self.players[0].refid)
+        if user is None:
+            raise Exception("user should not be none")
+
+        user_data = user.user_data
+        user_data.syogo = self.players[0].syogodata.get.syogo
+        db.session.commit()
+
         return load_xml_template("customize", "regist")

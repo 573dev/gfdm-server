@@ -3,11 +3,11 @@
         <card no="1" state="{state}">
             <kind __type="s8">0</kind>
             <name __type="str">{name}</name>
-            <gdp __type="u32">0</gdp>
-            <skill __type="s32">0</skill>
-            <all_skill __type="s32">0</all_skill>
+            <gdp __type="u32">{gdp}</gdp>
+            <skill __type="s32">{skill}</skill>
+            <all_skill __type="s32">{all_skill}</all_skill>
             <chara __type="u8">{chara}</chara>
-            <syogo __type="s16" __count="2">0 0</syogo>
+            <syogo __type="s16" __count="2">{syogo}</syogo>
             <penalty __type="u8">0</penalty>
         </card>
     </cardutil>
