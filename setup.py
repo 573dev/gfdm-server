@@ -5,18 +5,25 @@ from setuptools import find_packages, setup
 
 
 TEST_DEPS = ["coverage[toml]", "pytest", "pytest-cov"]
-DOCS_DEPS = ["sphinx", "sphinx-rtd-theme", "sphinx-autoapi", "recommonmark"]
-CHECK_DEPS = ["isort", "flake8", "flake8-quotes", "pep8-naming", "mypy", "black"]
+DOCS_DEPS = ["recommonmark", "sphinx", "sphinx-autoapi", "sphinx-rtd-theme"]
+CHECK_DEPS = [
+    "black",
+    "flake8",
+    "flake8-quotes",
+    "isort[colors]",
+    "mypy",
+    "pep8-naming",
+]
 REQUIREMENTS = [
     "flask",
     "flask_sqlalchemy",
-    "watchdog",
-    "pyopenssl",
+    "kbinxml",
     "lxml",
     "pycryptodome",
-    "kbinxml",
+    "pyopenssl",
     "sqlalchemy",
     "sqlalchemy-stubs",
+    "watchdog",
 ]
 
 EXTRAS = {
