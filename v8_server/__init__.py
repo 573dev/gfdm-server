@@ -35,8 +35,19 @@ class RequestFormatter(logging.Formatter):
         return super().format(record)
 
 
+def make_log(path):
+    if not path.exists() and not path.is_file():
+        with path.open("a") as f:
+            f.write("")
+
+
 # Define the logger
 LOG_PATH = Path(__file__).parent.parent / "logs"
+LOG_PATH.mkdir(parents=True, exist_ok=True)
+make_log(LOG_PATH / "debug.log")
+make_log(LOG_PATH / "requests.log")
+make_log(LOG_PATH / "all.log")
+make_log(LOG_PATH / "werkzeug.log")
 dictConfig(
     {
         "version": 1,

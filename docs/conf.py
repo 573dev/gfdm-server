@@ -1,6 +1,16 @@
+from datetime import datetime
+
+from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 
 from v8_server import __version__
+
+
+# This exists to fix a bug in recommonmark due to a missing function definition
+# https://github.com/readthedocs/recommonmark/issues/177
+class CustomCommonMarkParser(CommonMarkParser):
+    def visit_document(self, node):
+        pass
 
 
 # Sphinx Base --------------------------------------------------------------------------
@@ -16,8 +26,6 @@ extensions = [
     "sphinx.ext.viewcode",
     # https://sphinx-autoapi.readthedocs.io/en/latest/
     "autoapi.extension",
-    # https://github.com/rtfd/recommonmark
-    "recommonmark",
 ]
 
 # Set initial page name
@@ -25,7 +33,7 @@ master_doc = "index"
 
 # Project settings
 project = "V8 Server"
-year = "2020"
+year = datetime.now().year
 author = "573dev"
 copyright = f"{year}, {author}"
 
@@ -64,9 +72,8 @@ napoleon_use_param = False
 # Sphinx Extension AutoAPI -------------------------------------------------------------
 autoapi_type = "python"
 autoapi_dirs = ["../v8_server/"]
-autoapi_template_dir = "docs/autoapi_templates"
+autoapi_template_dir = "./autoapi_templates"
 autoapi_root = "autoapi"
-autoapi_ignore = ["*/v8_server/version.py"]
 autoapi_add_toctree_entry = False
 autoapi_keep_files = False
 
@@ -80,6 +87,8 @@ def setup(app):
     # Set source filetype(s)
     # Allow .rst files along with .md
     app.add_source_suffix(".rst", "restructuredtext")
+    app.add_source_suffix(".md", "markdown")
+    app.add_source_parser(CustomCommonMarkParser)
 
     # RecommonMark Settings ------------------------------------------------------------
     # Enable the evaluation of rst directive in .md files
